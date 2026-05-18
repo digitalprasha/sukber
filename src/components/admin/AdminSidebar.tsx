@@ -35,8 +35,8 @@ export function AdminSidebar({ onSignOut, role }: { onSignOut: () => void; role?
   const pathname = usePathname()
 
   return (
-    <aside className="w-64 min-h-screen bg-[#0a0a14] border-r border-white/10 flex flex-col">
-      <div className="p-6 border-b border-white/10">
+    <aside className="w-64 h-screen bg-[#0a0a14] border-r border-white/10 flex flex-col overflow-hidden">
+      <div className="p-6 border-b border-white/10 shrink-0">
         <a href="/admin" className="flex items-center gap-2 text-lg font-bold">
           <Music2 className="text-emerald-400" size={24} />
           <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">
@@ -45,7 +45,7 @@ export function AdminSidebar({ onSignOut, role }: { onSignOut: () => void; role?
         </a>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.filter(item => !item.adminOnly || role === 'super_admin' || role === 'developer').map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (

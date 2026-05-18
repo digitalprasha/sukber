@@ -55,9 +55,9 @@ export async function Footer() {
             </p>
             <p className="text-sm text-gray-600">
               Developed by{' '}
-              <a href="https://prashadigital.com" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+              <span className="text-gray-500">
                 PT. PRASHA DIGITAL INDONESIA
-              </a>
+              </span>
             </p>
           </div>
         </div>

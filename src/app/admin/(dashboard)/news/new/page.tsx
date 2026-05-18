@@ -15,6 +15,7 @@ export default function NewNewsPage() {
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ title: '', slug: '', content: '', tags: '' })
   const [thumbnail, setThumbnail] = useState<File | null>(null)
+  const [thumbPreview, setThumbPreview] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -72,7 +73,16 @@ export default function NewNewsPage() {
           <label className="block text-sm font-medium text-gray-300">Konten</label>
           <RichTextEditor content={form.content} onChange={(html) => setForm({ ...form, content: html })} placeholder="Tulis berita di sini..." />
         </div>
-        <Input label="Thumbnail" type="file" accept="image/*" onChange={(e) => setThumbnail(e.target.files?.[0] || null)} />
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-gray-300">Thumbnail</label>
+          <input type="file" accept="image/*" onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) { setThumbnail(file); setThumbPreview(URL.createObjectURL(file)) }
+          }} className="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
+          {thumbPreview && (
+            <img src={thumbPreview} alt="Preview" className="mt-2 h-32 w-auto rounded-xl object-cover border border-white/10" />
+          )}
+        </div>
         <div className="flex gap-4">
           <Button type="submit" loading={loading}>Simpan</Button>
           <Button type="button" variant="ghost" onClick={() => router.back()}>Batal</Button>

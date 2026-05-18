@@ -25,6 +25,9 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: 'SBS', description: '' })
+  const [flyer, setFlyer] = useState<File | null>(null)
+  const [flyerPreview, setFlyerPreview] = useState('')
+  const [existingFlyer, setExistingFlyer] = useState('')
   const [sponsors, setSponsors] = useState<SponsorField[]>([])
 
   useEffect(() => {
@@ -35,6 +38,7 @@ export default function EditEventPage() {
       if (evRes.data) {
         const ev = evRes.data
         setForm({ title: ev.title, slug: ev.slug, ticket_prefix: ev.ticket_prefix, description: ev.description })
+        setExistingFlyer(ev.flyer_url || '')
       }
       if (spRes.data) {
         setSponsors(spRes.data.map((s: any) => ({
@@ -67,6 +71,18 @@ export default function EditEventPage() {
     const { data: { user } } = await supabase.auth.getUser()
     const user_email = user?.email || 'unknown'
 
+    let flyer_url = existingFlyer
+    if (flyer) {
+      const fd = new FormData()
+      fd.append('file', flyer)
+      fd.append('type', 'flyer')
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd })
+      if (uploadRes.ok) {
+        const data = await uploadRes.json()
+        flyer_url = data.url
+      }
+    }
+
     const res = await fetch('/api/admin/events', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -75,7 +91,7 @@ export default function EditEventPage() {
         id: params.id,
         title: form.title,
         user_email,
-        fields: { title: form.title, slug: form.slug, ticket_prefix: form.ticket_prefix, description: form.description },
+        fields: { title: form.title, slug: form.slug, ticket_prefix: form.ticket_prefix, description: form.description, flyer_url },
       }),
     })
     const result = await res.json()
@@ -142,6 +158,23 @@ export default function EditEventPage() {
         <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
         <Input label="Prefix Tiket" value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })} required />
         <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-gray-300">Flyer / Poster</label>
+          <input type="file" accept="image/*" onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) { setFlyer(file); setFlyerPreview(URL.createObjectURL(file)) }
+          }} className="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
+          {existingFlyer && !flyerPreview && (
+            <div className="flex items-center gap-2 mt-2">
+              <img src={existingFlyer} alt="Flyer saat ini" className="h-24 w-auto rounded-xl object-cover border border-white/10" />
+              <span className="text-xs text-gray-500">Flyer saat ini</span>
+            </div>
+          )}
+          {flyerPreview && (
+            <img src={flyerPreview} alt="Preview flyer" className="mt-2 h-40 w-auto rounded-xl object-cover border border-white/10" />
+          )}
+        </div>
+
+        <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-300">Deskripsi</label>
           <RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} />
         </div>
@@ -174,6 +207,9 @@ export default function EditEventPage() {
                       updateSponsor(idx, { logo: file, preview: URL.createObjectURL(file) })
                     }
                   }} className="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
+                  {sp.preview && (
+                    <img src={sp.preview} alt="Preview logo sponsor" className="mt-2 h-10 w-auto rounded-lg border border-white/10" />
+                  )}
                 </div>
                 <Input
                   label="Nama (admin saja)"

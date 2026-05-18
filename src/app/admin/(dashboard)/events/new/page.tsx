@@ -22,6 +22,7 @@ export default function NewEventPage() {
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: 'SBS', description: '' })
   const [flyer, setFlyer] = useState<File | null>(null)
+  const [flyerPreview, setFlyerPreview] = useState('')
   const [sponsors, setSponsors] = useState<SponsorField[]>([])
 
   const addSponsor = () => {
@@ -116,7 +117,16 @@ export default function NewEventPage() {
           <label className="block text-sm font-medium text-gray-300">Deskripsi</label>
           <RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} placeholder="Tulis deskripsi event..." />
         </div>
-        <Input label="Flyer / Poster" type="file" accept="image/*" onChange={(e) => setFlyer(e.target.files?.[0] || null)} />
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-gray-300">Flyer / Poster</label>
+          <input type="file" accept="image/*" onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) { setFlyer(file); setFlyerPreview(URL.createObjectURL(file)) }
+          }} className="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
+          {flyerPreview && (
+            <img src={flyerPreview} alt="Preview flyer" className="mt-2 h-40 w-auto rounded-xl object-cover border border-white/10" />
+          )}
+        </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -132,7 +142,7 @@ export default function NewEventPage() {
           {sponsors.map((sp, idx) => (
             <div key={idx} className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
               <div className="flex-1 space-y-3">
-                <div className="flex-1">
+                <div>
                   <label className="block text-[11px] text-gray-500 mb-1">Logo</label>
                   <input type="file" accept="image/*" onChange={(e) => {
                     const file = e.target.files?.[0]
@@ -140,6 +150,9 @@ export default function NewEventPage() {
                       updateSponsor(idx, { logo: file, preview: URL.createObjectURL(file) })
                     }
                   }} className="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
+                  {sp.preview && (
+                    <img src={sp.preview} alt="Preview logo sponsor" className="mt-2 h-10 w-auto rounded-lg border border-white/10" />
+                  )}
                 </div>
                 <Input
                   label="Nama (admin saja)"
