@@ -29,8 +29,15 @@ function FloatingOrbs() {
 
 export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const supabase = createClient()
   const mouse = useMousePosition()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const err = params.get('error')
+    if (err === 'auth_failed') setError('Gagal masuk. Silakan coba lagi.')
+  }, [])
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -70,6 +77,12 @@ export default function AdminLoginPage() {
             <h1 className="text-2xl font-bold text-white tracking-tight">Login</h1>
             <p className="text-gray-500 mt-2 text-sm">SukaBernyanyi Sukabumi</p>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm text-center">
+              {error}
+            </div>
+          )}
 
           <Button
             onClick={handleGoogleLogin}

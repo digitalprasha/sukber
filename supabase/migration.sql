@@ -191,6 +191,23 @@ CREATE POLICY "Participants update admin" ON event_management.participants
   FOR UPDATE USING (public.is_staff(auth.jwt() ->> 'email', ARRAY['admin', 'super_admin', 'developer', 'scanner']));
 
 -- ============================================
+-- CONTACT INFO (editable from admin)
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.contact_info (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT NOT NULL UNIQUE,
+  value TEXT NOT NULL DEFAULT ''
+);
+
+ALTER TABLE public.contact_info ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Contact info public read" ON public.contact_info
+  FOR SELECT USING (true);
+
+CREATE POLICY "Contact info admin all" ON public.contact_info
+  FOR ALL USING (public.is_staff(auth.jwt() ->> 'email', ARRAY['admin', 'super_admin', 'developer']));
+
+-- ============================================
 -- SEED DATA
 -- ============================================
 

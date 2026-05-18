@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   Music2,
+  Phone,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,7 @@ const navItems = [
   { href: '/admin/tickets', label: 'Tickets', icon: Ticket },
   { href: '/admin/scanner', label: 'Scanner', icon: QrCode },
   { href: '/admin/logs', label: 'Activity Logs', icon: History },
+  { href: '/admin/kontak', label: 'Kontak', icon: Phone },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 

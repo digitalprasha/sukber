@@ -24,9 +24,14 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      const redirectResponse = NextResponse.redirect(`${origin}${next}`)
+      request.cookies.getAll().forEach(({ name, value }) => {
+        redirectResponse.cookies.set(name, value)
+      })
+      return redirectResponse
     }
-    console.error('Auth callback error:', error?.message)
+
+    console.error('Auth exchange error:', error?.message)
   }
 
   return NextResponse.redirect(`${origin}/admin/login?error=auth_failed`)
