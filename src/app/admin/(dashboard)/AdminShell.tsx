@@ -21,6 +21,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    await fetch('/api/auth/signout', { method: 'POST' })
     router.push('/admin/login')
     router.refresh()
   }

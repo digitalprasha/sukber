@@ -64,41 +64,67 @@ export default function EditEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const { error } = await supabase.from('events').update(form).eq('id', params.id)
+    const { data: { user } } = await supabase.auth.getUser()
+    const user_email = user?.email || 'unknown'
 
-    if (error) {
-      toast.error(error.message)
+    const res = await fetch('/api/admin/events', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'update_event',
+        id: params.id,
+        title: form.title,
+        user_email,
+        fields: { title: form.title, slug: form.slug, ticket_prefix: form.ticket_prefix, description: form.description },
+      }),
+    })
+    const result = await res.json()
+    if (!res.ok) {
+      toast.error(result.error || 'Gagal mengupdate event')
       setLoading(false)
       return
     }
 
     const existingIds = sponsors.filter((s) => s.id).map((s) => s.id!)
-    await supabase.from('sponsors').delete().eq('event_id', params.id).not('id', 'in', `(${existingIds.join(',')})`)
+    if (existingIds.length > 0) {
+      await supabase.from('sponsors').delete().eq('event_id', params.id).not('id', 'in', `(${existingIds.join(',')})`)
+    } else {
+      await supabase.from('sponsors').delete().eq('event_id', params.id)
+    }
 
     for (const sp of sponsors) {
+      let logo_url = sp.existing_logo_url || ''
       if (sp.logo) {
         const fd = new FormData()
         fd.append('file', sp.logo)
         fd.append('type', 'sponsor')
-        const res = await fetch('/api/upload', { method: 'POST', body: fd })
-        const { url } = await res.json()
-        if (sp.id) {
-          await supabase.from('sponsors').update({ name: sp.name, logo_url: url }).eq('id', sp.id)
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd })
+        const uploadData = await uploadRes.json()
+        logo_url = uploadData.url
+      }
+
+      if (sp.id) {
+        if (logo_url) {
+          await fetch('/api/admin/events', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_sponsor', id: sp.id, fields: { name: sp.name, logo_url } }),
+          })
         } else {
-          await supabase.from('sponsors').insert({ event_id: params.id, name: sp.name, logo_url: url })
+          await fetch('/api/admin/events', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_sponsor', id: sp.id, fields: { name: sp.name } }),
+          })
         }
-      } else if (sp.id) {
-        await supabase.from('sponsors').update({ name: sp.name }).eq('id', sp.id)
-      } else if (sp.name) {
-        await supabase.from('sponsors').insert({ event_id: params.id, name: sp.name })
+      } else {
+        await fetch('/api/admin/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'add_sponsor', event_id: params.id, name: sp.name, logo_url }),
+        })
       }
     }
-
-    await supabase.from('audit_logs').insert({
-      user_email: (await supabase.auth.getUser()).data.user?.email,
-      action: 'UPDATE_EVENT',
-      details: `Mengupdate event: ${form.title}`,
-    })
 
     toast.success('Event berhasil diupdate')
     router.push('/admin/events')
@@ -120,7 +146,6 @@ export default function EditEventPage() {
           <RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} />
         </div>
 
-        {/* Sponsor Section */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-gray-300">Sponsor</label>

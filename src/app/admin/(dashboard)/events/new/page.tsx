@@ -39,45 +39,67 @@ export default function NewEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      const user_email = user?.email || 'unknown'
+
       let flyer_url = ''
       if (flyer) {
         const fd = new FormData()
         fd.append('file', flyer)
         fd.append('type', 'flyer')
         const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.error || 'Gagal upload flyer')
+        }
         const data = await res.json()
         flyer_url = data.url
       }
 
-      const { data: event, error } = await supabase.from('events').insert({ ...form, flyer_url }).select('id').single()
-      if (error) throw error
+      const res = await fetch('/api/admin/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_event',
+          title: form.title,
+          slug: form.slug,
+          ticket_prefix: form.ticket_prefix,
+          description: form.description,
+          flyer_url,
+          user_email,
+        }),
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Gagal membuat event')
 
       for (const sp of sponsors) {
         if (!sp.logo) continue
         const fd = new FormData()
         fd.append('file', sp.logo)
         fd.append('type', 'sponsor')
-        const res = await fetch('/api/upload', { method: 'POST', body: fd })
-        const { url } = await res.json()
-        await supabase.from('sponsors').insert({
-          event_id: event.id,
-          name: sp.name,
-          logo_url: url,
-        })
-      }
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd })
+        if (!uploadRes.ok) throw new Error('Gagal upload logo sponsor')
+        const { url } = await uploadRes.json()
 
-      await supabase.from('audit_logs').insert({
-        user_email: (await supabase.auth.getUser()).data.user?.email,
-        action: 'CREATE_EVENT',
-        details: `Membuat event baru: ${form.title} dengan ${sponsors.length} sponsor`,
-      })
+        const spRes = await fetch('/api/admin/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'add_sponsor', event_id: result.id, name: sp.name, logo_url: url }),
+        })
+        if (!spRes.ok) {
+          const spErr = await spRes.json()
+          throw new Error(spErr.error || 'Gagal menyimpan sponsor')
+        }
+      }
 
       toast.success('Event berhasil dibuat')
       router.push('/admin/events')
       router.refresh()
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Gagal membuat event')
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
@@ -96,7 +118,6 @@ export default function NewEventPage() {
         </div>
         <Input label="Flyer / Poster" type="file" accept="image/*" onChange={(e) => setFlyer(e.target.files?.[0] || null)} />
 
-        {/* Sponsor Section */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-gray-300">Sponsor</label>

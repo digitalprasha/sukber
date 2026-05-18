@@ -21,12 +21,6 @@ export default function AdminEventsPage() {
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null)
   const loaded = useRef(false)
 
-  useEffect(() => {
-    if (loaded.current) return
-    loaded.current = true
-    loadEvents()
-  }, [page, search])
-
   useEffect(() => { loadEvents() }, [page, search])
 
   async function loadEvents() {
@@ -43,14 +37,16 @@ export default function AdminEventsPage() {
 
   async function handleDelete() {
     if (!deleteTarget) return
-    const { error } = await supabase.from('events').delete().eq('id', deleteTarget.id)
-    if (error) {
-      toast.error(error.message)
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete_event', id: deleteTarget.id, title: deleteTarget.title, user_email: user?.email }),
+    })
+    const result = await res.json()
+    if (!res.ok) {
+      toast.error(result.error || 'Gagal menghapus event')
     } else {
-      await supabase.from('audit_logs').insert({
-        action: 'DELETE_EVENT',
-        details: `Menghapus event: ${deleteTarget.title}`,
-      })
       toast.success('Event berhasil dihapus')
       setDeleteTarget(null)
       loadEvents()
@@ -59,16 +55,17 @@ export default function AdminEventsPage() {
 
   async function handleReset() {
     if (!resetTarget) return
-    const { error: err1 } = await supabase.from('sponsors').delete().eq('event_id', resetTarget.id)
-    const { error: err2 } = await supabase.from('participants').delete().eq('event_id', resetTarget.id)
-    if (err1 || err2) {
-      toast.error(err1?.message || err2?.message)
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/events', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reset_event', id: resetTarget.id, title: resetTarget.title, user_email: user?.email }),
+    })
+    const result = await res.json()
+    if (!res.ok) {
+      toast.error(result.error || 'Gagal reset event')
     } else {
-      await supabase.from('audit_logs').insert({
-        action: 'RESET_EVENT',
-        details: `Reset data event: ${resetTarget.title} (peserta & sponsor dihapus)`,
-      })
-      toast.success(`Data event "${resetTarget.title}" berihasil direset`)
+      toast.success(`Data event "${resetTarget.title}" berhasil direset`)
       setResetTarget(null)
       loadEvents()
     }

@@ -7,19 +7,15 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/admin'
 
   if (code) {
-    const supabaseResponse = NextResponse.next()
-
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
+          getAll() { return request.cookies.getAll() },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
+              request.cookies.set(name, value)
             )
           },
         },
@@ -28,13 +24,10 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      const redirectResponse = NextResponse.redirect(`${origin}${next}`)
-      supabaseResponse.cookies.getAll().forEach(({ name, value, ...rest }) => {
-        redirectResponse.cookies.set(name, value, rest)
-      })
-      return redirectResponse
+      return NextResponse.redirect(`${origin}${next}`)
     }
+    console.error('Auth callback error:', error?.message)
   }
 
-  return NextResponse.redirect(`${origin}/?error=auth_failed`)
+  return NextResponse.redirect(`${origin}/admin/login?error=auth_failed`)
 }

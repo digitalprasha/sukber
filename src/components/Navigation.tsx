@@ -41,7 +41,7 @@ export function Navigation() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#060a08]/80 backdrop-blur-2xl border-b border-white/[0.03]">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
         <Link href="/" className="flex-shrink-0 block relative">
-          <div className="relative w-14 h-14 sm:w-20 sm:h-20">
+          <div className="relative w-[62px] h-[62px] sm:w-[90px] sm:h-[90px]">
             <Image
               src="/logo.png"
               alt="SukaBernyanyi"
