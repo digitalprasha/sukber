@@ -41,10 +41,13 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 50)
+      if (isOpen) setIsOpen(false)
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isOpen])
 
   return (
     <nav className={cn(
@@ -99,8 +102,8 @@ export function Navigation() {
       </div>
 
       <div className={cn(
-        'md:hidden overflow-hidden transition-all duration-400 ease-in-out',
-        isOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+        'md:hidden transition-all duration-400 ease-in-out',
+        isOpen ? 'max-h-[100vh] opacity-100' : 'max-h-0 opacity-0'
       )}>
         <div className="px-4 pb-4 space-y-1">
           {links.map((link) => (
