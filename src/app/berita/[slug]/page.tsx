@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
 import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
+import { ShareButton } from '@/components/ui/ShareButton'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
 import { notFound } from 'next/navigation'
@@ -72,7 +73,7 @@ export default async function NewsDetailPage({ params }: Props) {
             html={news.content}
           />
 
-          <div className="mt-12 pt-8 border-t border-white/10">
+          <div className="mt-12 pt-8 border-t border-white/10 flex items-center justify-between">
             <Link
               href="/berita"
               className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
@@ -82,6 +83,7 @@ export default async function NewsDetailPage({ params }: Props) {
               </svg>
               Kembali ke Berita
             </Link>
+            <ShareButton url={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://suka-bernyanyi-smi.vercel.app'}/berita/${news.slug}`} title={news.title} />
           </div>
         </article>
       </main>

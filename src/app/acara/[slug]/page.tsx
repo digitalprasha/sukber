@@ -2,6 +2,7 @@ import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
 import { RegistrationForm } from '@/components/events/RegistrationForm'
 import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
+import { ShareButton } from '@/components/ui/ShareButton'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -63,7 +64,10 @@ export default async function EventDetailPage({ params }: Props) {
               </div>
             )}
 
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{event.title}</h1>
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h1>
+              <ShareButton url={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://suka-bernyanyi-smi.vercel.app'}/acara/${event.slug}`} title={event.title} />
+            </div>
             <SanitizedHtml
               className="prose prose-invert prose-emerald max-w-none text-gray-400"
               html={event.description}

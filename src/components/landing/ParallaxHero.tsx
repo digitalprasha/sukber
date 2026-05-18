@@ -104,31 +104,47 @@ function FloatingNote({
 export function ParallaxHero() {
   const mouse = useMousePosition()
   const heroRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef(0)
   const [scrollY, setScrollY] = useState(0)
+  const rafRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
-    const handler = () => setScrollY(window.scrollY)
+    const handler = () => {
+      scrollRef.current = window.scrollY
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(() => {
+          setScrollY(scrollRef.current)
+          rafRef.current = undefined
+        })
+      }
+    }
     window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
+    return () => {
+      window.removeEventListener('scroll', handler)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
   }, [])
 
   const parallaxStyle = (speed: number) =>
     ({
       transform: `translateY(${scrollY * speed}px)`,
+      willChange: 'transform',
     }) as React.CSSProperties
 
   return (
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#060a08] selection:bg-emerald-500/30"
+      style={{ perspective: '1px', transformStyle: 'preserve-3d' }}
     >
       {/* Animated gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden" style={parallaxStyle(0.3)}>
         <div
           className="absolute -top-1/2 -left-1/2 w-[120%] h-[120%] animate-slow-spin opacity-30"
           style={{
             background:
               'radial-gradient(ellipse at 30% 20%, rgba(5,150,105,0.15) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(217,119,6,0.1) 0%, transparent 60%)',
+            willChange: 'transform',
           }}
         />
         <div
@@ -142,12 +158,12 @@ export function ParallaxHero() {
       </div>
 
       {/* Sound wave visualization */}
-      <div className="absolute inset-0 z-[1]" style={parallaxStyle(0.15)}>
+      <div className="absolute inset-0 z-[1]" style={parallaxStyle(0.25)}>
         <SoundWave />
       </div>
 
       {/* Floating notes layer */}
-      <div className="absolute inset-0 z-[2]" style={parallaxStyle(0.4)}>
+      <div className="absolute inset-0 z-[2]" style={parallaxStyle(0.6)}>
         {Array.from({ length: 12 }).map((_, i) => (
           <FloatingNote
             key={i}
@@ -159,7 +175,7 @@ export function ParallaxHero() {
       </div>
 
       {/* Content layer */}
-      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto" style={parallaxStyle(-0.05)}>
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto" style={parallaxStyle(-0.08)}>
         <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-md text-emerald-300 text-sm mb-10 animate-fade-in shadow-lg shadow-emerald-500/5">
           <span className="relative flex h-2.5 w-2.5">
             <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
