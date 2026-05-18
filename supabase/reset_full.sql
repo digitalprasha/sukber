@@ -17,7 +17,7 @@ INSERT INTO public.staff (id, email, role, is_deletable) VALUES
   ('00000000-0000-0000-0000-000000000001', 'sukabernyanyis@gmail.com', 'super_admin', false),
   ('00000000-0000-0000-0000-000000000002', 'digitalprasha@gmail.com', 'developer', false);
 
--- Events table with is_active
+-- Events table with is_active + registration settings
 CREATE TABLE event_management.events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
@@ -26,6 +26,11 @@ CREATE TABLE event_management.events (
   ticket_prefix TEXT NOT NULL DEFAULT 'SBS',
   description TEXT NOT NULL DEFAULT '',
   is_active BOOLEAN DEFAULT true,
+  registration_enabled BOOLEAN DEFAULT true,
+  registration_fee NUMERIC(10,2) DEFAULT 0,
+  max_participants INTEGER,
+  registration_deadline TIMESTAMPTZ,
+  payment_info TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

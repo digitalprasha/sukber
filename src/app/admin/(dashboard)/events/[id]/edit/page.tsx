@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Toggle } from '@/components/ui/Toggle'
 import { RichTextEditor } from '@/components/editor/RichTextEditor'
 import { slugify } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -25,6 +26,9 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: 'SBS', description: '' })
+  const [registration, setRegistration] = useState({
+    enabled: true, fee: 0, max_participants: '', deadline: '', payment_info: '',
+  })
   const [flyer, setFlyer] = useState<File | null>(null)
   const [flyerPreview, setFlyerPreview] = useState('')
   const [existingFlyer, setExistingFlyer] = useState('')
@@ -39,6 +43,13 @@ export default function EditEventPage() {
         const ev = evRes.data
         setForm({ title: ev.title, slug: ev.slug, ticket_prefix: ev.ticket_prefix, description: ev.description })
         setExistingFlyer(ev.flyer_url || '')
+        setRegistration({
+          enabled: ev.registration_enabled ?? true,
+          fee: ev.registration_fee ?? 0,
+          max_participants: ev.max_participants?.toString() || '',
+          deadline: ev.registration_deadline ? ev.registration_deadline.slice(0, 16) : '',
+          payment_info: ev.payment_info || '',
+        })
       }
       if (spRes.data) {
         setSponsors(spRes.data.map((s: any) => ({
@@ -91,7 +102,18 @@ export default function EditEventPage() {
         id: params.id,
         title: form.title,
         user_email,
-        fields: { title: form.title, slug: form.slug, ticket_prefix: form.ticket_prefix, description: form.description, flyer_url },
+        fields: {
+          title: form.title,
+          slug: form.slug,
+          ticket_prefix: form.ticket_prefix,
+          description: form.description,
+          flyer_url,
+          registration_enabled: registration.enabled,
+          registration_fee: registration.fee,
+          max_participants: registration.max_participants ? Number(registration.max_participants) : null,
+          registration_deadline: registration.deadline || null,
+          payment_info: registration.payment_info,
+        },
       }),
     })
     const result = await res.json()
@@ -177,6 +199,28 @@ export default function EditEventPage() {
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-300">Deskripsi</label>
           <RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} />
+        </div>
+
+        <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-4">
+          <h3 className="text-sm font-semibold text-white">Pengaturan Pendaftaran</h3>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Buka Pendaftaran</span>
+            <Toggle checked={registration.enabled} onChange={(v) => setRegistration({ ...registration, enabled: v })} />
+          </div>
+          {registration.enabled && (
+            <div className="space-y-4 pt-2">
+              <Input label="Biaya Pendaftaran (Rp)" type="number" min={0} value={registration.fee} onChange={(e) => setRegistration({ ...registration, fee: Number(e.target.value) })} />
+              <Input label="Maksimal Peserta (opsional)" type="number" min={1} value={registration.max_participants} onChange={(e) => setRegistration({ ...registration, max_participants: e.target.value })} />
+              <Input label="Batas Waktu Pendaftaran (opsional)" type="datetime-local" value={registration.deadline} onChange={(e) => setRegistration({ ...registration, deadline: e.target.value })} />
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-300">Informasi Pembayaran</label>
+                <p className="text-[11px] text-gray-500">Masukkan nomor rekening bank atau e-wallet untuk pembayaran</p>
+                <textarea value={registration.payment_info} onChange={(e) => setRegistration({ ...registration, payment_info: e.target.value })}
+                  rows={4} placeholder="BCA: 1234567890 a.n. SukaBernyanyi&#10;DANA: 081234567890"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 resize-y text-sm" />
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">

@@ -90,14 +90,33 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
 
           <div>
-            <div className="sticky top-24">
-              <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-                <h2 className="text-xl font-semibold text-white mb-6">Pendaftaran</h2>
-                <RegistrationForm
-                  eventId={event.id}
-                  ticketPrefix={event.ticket_prefix}
-                />
-              </div>
+            <div className="sticky top-24 space-y-6">
+              {event.registration_enabled !== false && (
+                <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+                  <h2 className="text-xl font-semibold text-white mb-6">Pendaftaran</h2>
+
+                  {event.payment_info && (
+                    <div className="mb-6 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                      <h3 className="text-sm font-medium text-emerald-300 mb-2">Informasi Pembayaran</h3>
+                      <p className="text-sm text-gray-300 whitespace-pre-wrap">{event.payment_info}</p>
+                    </div>
+                  )}
+
+                  <RegistrationForm
+                    eventId={event.id}
+                    ticketPrefix={event.ticket_prefix}
+                    fee={event.registration_fee}
+                    maxParticipants={event.max_participants}
+                    deadline={event.registration_deadline}
+                  />
+                </div>
+              )}
+
+              {event.registration_enabled === false && (
+                <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
+                  <p className="text-gray-500">Pendaftaran untuk acara ini sedang ditutup</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

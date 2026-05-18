@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Toggle } from '@/components/ui/Toggle'
 import { RichTextEditor } from '@/components/editor/RichTextEditor'
 import { slugify } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -21,6 +22,9 @@ export default function NewEventPage() {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: 'SBS', description: '' })
+  const [registration, setRegistration] = useState({
+    enabled: true, fee: 0, max_participants: '', deadline: '', payment_info: '',
+  })
   const [flyer, setFlyer] = useState<File | null>(null)
   const [flyerPreview, setFlyerPreview] = useState('')
   const [sponsors, setSponsors] = useState<SponsorField[]>([])
@@ -69,6 +73,11 @@ export default function NewEventPage() {
           ticket_prefix: form.ticket_prefix,
           description: form.description,
           flyer_url,
+          registration_enabled: registration.enabled,
+          registration_fee: registration.fee,
+          max_participants: registration.max_participants ? Number(registration.max_participants) : null,
+          registration_deadline: registration.deadline || null,
+          payment_info: registration.payment_info,
           user_email,
         }),
       })
@@ -125,6 +134,28 @@ export default function NewEventPage() {
           }} className="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
           {flyerPreview && (
             <img src={flyerPreview} alt="Preview flyer" className="mt-2 h-40 w-auto rounded-xl object-cover border border-white/10" />
+          )}
+        </div>
+
+        <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-4">
+          <h3 className="text-sm font-semibold text-white">Pengaturan Pendaftaran</h3>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Buka Pendaftaran</span>
+            <Toggle checked={registration.enabled} onChange={(v) => setRegistration({ ...registration, enabled: v })} />
+          </div>
+          {registration.enabled && (
+            <div className="space-y-4 pt-2">
+              <Input label="Biaya Pendaftaran (Rp)" type="number" min={0} value={registration.fee} onChange={(e) => setRegistration({ ...registration, fee: Number(e.target.value) })} />
+              <Input label="Maksimal Peserta (opsional)" type="number" min={1} value={registration.max_participants} onChange={(e) => setRegistration({ ...registration, max_participants: e.target.value })} />
+              <Input label="Batas Waktu Pendaftaran (opsional)" type="datetime-local" value={registration.deadline} onChange={(e) => setRegistration({ ...registration, deadline: e.target.value })} />
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-300">Informasi Pembayaran</label>
+                <p className="text-[11px] text-gray-500">Masukkan nomor rekening bank atau e-wallet untuk pembayaran</p>
+                <textarea value={registration.payment_info} onChange={(e) => setRegistration({ ...registration, payment_info: e.target.value })}
+                  rows={4} placeholder="BCA: 1234567890 a.n. SukaBernyanyi&#10;DANA: 081234567890"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 resize-y text-sm" />
+              </div>
+            </div>
           )}
         </div>
 

@@ -3,14 +3,17 @@
 import { useState } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
-import { Upload, CheckCircle, AlertCircle } from 'lucide-react'
+import { Upload, CheckCircle, AlertCircle, Clock, Users, Coins } from 'lucide-react'
 
 interface RegistrationFormProps {
   eventId: string
   ticketPrefix?: string
+  fee?: number
+  maxParticipants?: number | null
+  deadline?: string | null
 }
 
-export function RegistrationForm({ eventId }: RegistrationFormProps) {
+export function RegistrationForm({ eventId, fee, maxParticipants, deadline }: RegistrationFormProps) {
   const [form, setForm] = useState({ name: '', email: '', whatsapp: '' })
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
@@ -72,8 +75,46 @@ export function RegistrationForm({ eventId }: RegistrationFormProps) {
     )
   }
 
+  const isPastDeadline = deadline && new Date(deadline) < new Date()
+
+  if (isPastDeadline) {
+    return (
+      <div className="text-center py-6">
+        <Clock className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+        <p className="text-gray-500 text-sm">Pendaftaran telah ditutup</p>
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {(fee || maxParticipants) && (
+        <div className="flex flex-wrap gap-3 mb-2">
+          {fee !== undefined && fee > 0 && (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              <Coins size={12} />
+              Rp {fee.toLocaleString('id-ID')}
+            </div>
+          )}
+          {fee === 0 && (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+              Gratis
+            </div>
+          )}
+          {maxParticipants && (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+              <Users size={12} />
+              Sisa {maxParticipants} kursi
+            </div>
+          )}
+          {deadline && (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
+              <Clock size={12} />
+              {new Date(deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </div>
+          )}
+        </div>
+      )}
       <Input
         label="Nama Lengkap"
         id="name"

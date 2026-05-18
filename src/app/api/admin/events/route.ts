@@ -8,9 +8,21 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
 
     if (action === 'create_event') {
+      const insertData: Record<string, unknown> = {
+        title: data.title,
+        slug: data.slug,
+        ticket_prefix: data.ticket_prefix,
+        description: data.description,
+        flyer_url: data.flyer_url || '',
+        registration_enabled: data.registration_enabled ?? true,
+        registration_fee: data.registration_fee ?? 0,
+        max_participants: data.max_participants || null,
+        registration_deadline: data.registration_deadline || null,
+        payment_info: data.payment_info || '',
+      }
       const { data: event, error } = await supabase
         .from('events')
-        .insert({ title: data.title, slug: data.slug, ticket_prefix: data.ticket_prefix, description: data.description, flyer_url: data.flyer_url || '' })
+        .insert(insertData)
         .select('id')
         .single()
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
