@@ -1,12 +1,20 @@
 'use client'
 
+import { useState, useRef, useEffect } from 'react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Menu } from 'lucide-react'
+import { Menu, LogOut } from 'lucide-react'
 import { Toaster } from '@/components/ui/Toaster'
 import type { UserRole } from '@/types'
+
+const ROLE_LABELS: Record<string, string> = {
+  super_admin: 'Super Admin',
+  developer: 'Developer',
+  admin: 'Admin',
+  panitia: 'Panitia',
+  scanner: 'Scanner',
+}
 
 interface AdminShellProps {
   children: React.ReactNode
@@ -17,7 +25,20 @@ interface AdminShellProps {
 export function AdminShell({ children, email, role }: AdminShellProps) {
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -27,21 +48,21 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
   }
 
   return (
-    <div className="flex h-screen bg-[#0f0f1a]">
-      <div className="hidden lg:block h-screen sticky top-0">
-        <AdminSidebar onSignOut={handleSignOut} role={role} />
+    <div className="flex min-h-screen bg-[#0f0f1a]">
+      <div className="hidden lg:flex h-screen sticky top-0">
+        <AdminSidebar collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} role={role} />
       </div>
 
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
-          <div className="fixed left-0 top-0 bottom-0 h-screen">
-            <AdminSidebar onSignOut={handleSignOut} role={role} />
+          <div className="fixed left-0 top-0 bottom-0">
+            <AdminSidebar collapsed={false} onToggleCollapse={() => {}} role={role} />
           </div>
         </div>
       )}
 
-        <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <header className="sticky top-0 z-40 bg-[#0f0f1a]/80 backdrop-blur-lg border-b border-white/10">
           <div className="flex items-center justify-between px-4 lg:px-8 h-16">
             <div className="flex items-center gap-4">
@@ -51,19 +72,37 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
               >
                 <Menu size={24} />
               </button>
-              <div className="hidden sm:block">
-                <p className="text-sm text-white">
-                  Selamat datang{', '}
-                  <span className="capitalize font-semibold text-emerald-300">{role.replace('_', ' ')}</span>
-                </p>
-              </div>
+              <p className="text-sm text-white hidden sm:block">
+                Selamat Datang, <span className="font-semibold text-emerald-300">{ROLE_LABELS[role] || role}</span>
+              </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-amber-500 flex items-center justify-center text-xs font-medium text-white shrink-0">
-                {email[0].toUpperCase()}
-              </div>
-              <span className="text-sm text-gray-400 hidden sm:inline">{email}</span>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-amber-500 flex items-center justify-center text-sm font-medium text-white shrink-0">
+                  {email[0].toUpperCase()}
+                </div>
+                <span className="text-sm text-gray-400 hidden sm:inline">{email}</span>
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-white/10 bg-[#0f0f1a] shadow-2xl shadow-black/50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-white/10">
+                    <p className="text-sm text-white truncate">{email}</p>
+                    <p className="text-xs text-gray-500 capitalize">{ROLE_LABELS[role] || role}</p>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-400 hover:text-rose-400 hover:bg-rose-600/10 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
