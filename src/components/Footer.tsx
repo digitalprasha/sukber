@@ -34,7 +34,7 @@ export async function Footer() {
             <div className="space-y-2 text-sm text-gray-500">
               <Link href="/berita" className="block hover:text-emerald-400 transition-colors">Berita</Link>
               <Link href="/acara" className="block hover:text-emerald-400 transition-colors">Acara</Link>
-              <Link href="/#gallery" className="block hover:text-emerald-400 transition-colors">Galeri</Link>
+              <Link href="/galeri" className="block hover:text-emerald-400 transition-colors">Galeri</Link>
             </div>
           </div>
 
