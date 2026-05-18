@@ -79,6 +79,17 @@ html {
   to { transform: rotate(360deg); }
 }
 
+.marquee-scroll {
+  display: flex;
+  width: max-content;
+  animation: marquee linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }

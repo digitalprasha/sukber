@@ -10,10 +10,10 @@ export function NewsCard({ news }: NewsCardProps) {
   return (
     <Link
       href={`/berita/${news.slug}`}
-      className="group block rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10"
+      className="group h-full flex flex-col rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10"
     >
       {news.thumbnail_url ? (
-        <div className="aspect-video overflow-hidden">
+        <div className="aspect-video overflow-hidden shrink-0">
           <img
             src={news.thumbnail_url}
             alt={news.title}
@@ -21,12 +21,12 @@ export function NewsCard({ news }: NewsCardProps) {
           />
         </div>
       ) : (
-        <div className="aspect-video bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center">
+        <div className="aspect-video shrink-0 bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center">
           <span className="text-4xl">🎵</span>
         </div>
       )}
 
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs text-gray-500">{formatDate(news.created_at)}</span>
           {news.tags && news.tags.length > 0 && (
