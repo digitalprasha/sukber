@@ -29,14 +29,14 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
   return (
     <div className="flex min-h-screen bg-[#0f0f1a]">
       <div className="hidden lg:block">
-        <AdminSidebar onSignOut={handleSignOut} />
+        <AdminSidebar onSignOut={handleSignOut} role={role} />
       </div>
 
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
           <div className="fixed left-0 top-0 bottom-0">
-            <AdminSidebar onSignOut={handleSignOut} />
+            <AdminSidebar onSignOut={handleSignOut} role={role} />
           </div>
         </div>
       )}

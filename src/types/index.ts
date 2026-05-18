@@ -60,12 +60,10 @@ export interface Participant {
 export interface Staff {
   id: string
   email: string
-  role: 'admin' | 'super_admin' | 'developer' | 'scanner'
+  role: 'admin' | 'super_admin' | 'developer' | 'scanner' | 'panitia'
   is_deletable: boolean
+  password_enabled: boolean
   created_at: string
 }
 
-export type UserRole = 'admin' | 'super_admin' | 'developer' | 'scanner'
-
-export const SUPER_ADMIN_IDS = ['super-admin-id-1', 'super-admin-id-2']
-export const DEVELOPER_IDS = ['dev-id-1']
+export type UserRole = 'admin' | 'super_admin' | 'developer' | 'scanner' | 'panitia'

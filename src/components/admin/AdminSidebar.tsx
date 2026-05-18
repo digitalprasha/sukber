@@ -13,8 +13,10 @@ import {
   LogOut,
   Music2,
   Phone,
+  Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { UserRole } from '@/types'
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -23,12 +25,13 @@ const navItems = [
   { href: '/admin/gallery', label: 'Galeri', icon: ImageIcon },
   { href: '/admin/tickets', label: 'Tickets', icon: Ticket },
   { href: '/admin/scanner', label: 'Scanner', icon: QrCode },
+  { href: '/admin/pengguna', label: 'Pengguna', icon: Users, adminOnly: true },
   { href: '/admin/logs', label: 'Activity Logs', icon: History },
   { href: '/admin/kontak', label: 'Kontak', icon: Phone },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 
-export function AdminSidebar({ onSignOut }: { onSignOut: () => void }) {
+export function AdminSidebar({ onSignOut, role }: { onSignOut: () => void; role?: UserRole }) {
   const pathname = usePathname()
 
   return (
@@ -43,7 +46,7 @@ export function AdminSidebar({ onSignOut }: { onSignOut: () => void }) {
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
-        {navItems.map((item) => {
+        {navItems.filter(item => !item.adminOnly || role === 'super_admin' || role === 'developer').map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <a
