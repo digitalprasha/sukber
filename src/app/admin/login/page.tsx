@@ -61,26 +61,15 @@ export default function AdminLoginPage() {
     setLoading(true)
     setError('')
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) {
-      setError(
-        signInError.message === 'Invalid login credentials'
-          ? 'Email atau password salah'
-          : 'Gagal masuk. Silakan coba lagi.'
-      )
-      setLoading(false)
-      return
-    }
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
 
-    const { data: staff } = await supabase
-      .from('staff')
-      .select('role')
-      .eq('email', data.user.email)
-      .single()
-
-    if (!staff) {
-      await supabase.auth.signOut()
-      setError('Akun tidak memiliki akses admin')
+    if (!res.ok) {
+      const { error: msg } = await res.json()
+      setError(msg || 'Gagal masuk. Silakan coba lagi.')
       setLoading(false)
       return
     }
