@@ -1,25 +1,22 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { Pagination } from '@/components/ui/Pagination'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { TableSkeleton } from '@/components/ui/Skeleton'
 import { getWaUrl, getMailtoUrl } from '@/lib/utils'
 import { CheckCircle, XCircle, Send, ExternalLink, Search } from 'lucide-react'
+import { toast } from 'sonner'
+
+const PER_PAGE = 15
 
 interface Participant {
-  id: string
-  event_id: string
-  name: string
-  email: string
-  whatsapp: string
-  payment_proof_url: string
-  registration_number: string | null
-  status: string
-  is_checked_in: boolean
-  created_at: string
-  events?: { title: string; ticket_prefix: string }
+  id: string; event_id: string; name: string; email: string; whatsapp: string
+  payment_proof_url: string; registration_number: string | null; status: string
+  is_checked_in: boolean; created_at: string; events?: { title: string; ticket_prefix: string }
 }
 
 export default function TicketsPage() {
@@ -29,86 +26,86 @@ export default function TicketsPage() {
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [approveTarget, setApproveTarget] = useState<Participant | null>(null)
+  const [rejectTarget, setRejectTarget] = useState<Participant | null>(null)
   const loaded = useRef(false)
 
-  const reload = useCallback(() => {
+  const reload = () => {
     setLoading(true)
+    const eventFilter = selectedEvent !== 'all' ? `event_id.eq.${selectedEvent}` : undefined
+    const searchFilter = searchQuery
+      ? `or(name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,registration_number.ilike.%${searchQuery}%)`
+      : undefined
+
     Promise.all([
-      supabase.from('participants').select('*').order('created_at', { ascending: false }),
+      supabase.from('participants').select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range((page - 1) * PER_PAGE, page * PER_PAGE - 1),
       supabase.from('events').select('id, title, ticket_prefix'),
     ]).then(([partRes, evRes]) => {
       setParticipants(partRes.data || [])
+      setTotal(partRes.count || 0)
       setEvents(evRes.data || [])
     }).finally(() => setLoading(false))
-  }, [supabase])
+  }
 
   useEffect(() => {
     if (loaded.current) return
     loaded.current = true
     reload()
-  }, [supabase, reload])
+  }, [page, selectedEvent, searchQuery])
 
-  async function handleVerify(participant: Participant) {
-    const event = events.find((e) => e.id === participant.event_id)
+  async function handleVerify() {
+    if (!approveTarget) return
+    const event = events.find((e) => e.id === approveTarget.event_id)
     if (!event) return
 
     const count = participants.filter(
-      (p) => p.event_id === participant.event_id && p.registration_number
+      (p) => p.event_id === approveTarget.event_id && p.registration_number
     ).length
 
     const regNumber = `${event.ticket_prefix}${String(count + 1).padStart(3, '0')}`
-
-    const { error } = await supabase
-      .from('participants')
-      .update({
-        status: 'verified',
-        registration_number: regNumber,
-      })
-      .eq('id', participant.id)
+    const { error } = await supabase.from('participants').update({
+      status: 'verified', registration_number: regNumber,
+    }).eq('id', approveTarget.id)
 
     if (error) {
-      alert(error.message)
+      toast.error(error.message)
     } else {
       await supabase.from('audit_logs').insert({
         user_email: (await supabase.auth.getUser()).data.user?.email,
         action: 'VERIFY_PARTICIPANT',
-        details: `Verifikasi peserta ${participant.name} - No: ${regNumber}`,
+        details: `Verifikasi peserta ${approveTarget.name} - No: ${regNumber}`,
       })
+      toast.success(`${approveTarget.name} berhasil diverifikasi — ${regNumber}`)
+      setApproveTarget(null)
       reload()
     }
   }
 
-  async function handleReject(participant: Participant) {
-    const { error } = await supabase
-      .from('participants')
-      .update({ status: 'pending', payment_proof_url: '' })
-      .eq('id', participant.id)
+  async function handleRejectConfirm() {
+    if (!rejectTarget) return
+    const { error } = await supabase.from('participants').update({
+      status: 'pending', payment_proof_url: '',
+    }).eq('id', rejectTarget.id)
 
-    if (!error) {
+    if (error) {
+      toast.error(error.message)
+    } else {
       await supabase.from('audit_logs').insert({
         user_email: (await supabase.auth.getUser()).data.user?.email,
         action: 'REJECT_PARTICIPANT',
-        details: `Menolak peserta ${participant.name}`,
+        details: `Menolak peserta ${rejectTarget.name}`,
       })
+      toast.success(`Peserta ${rejectTarget.name} ditolak`)
+      setRejectTarget(null)
       reload()
     }
   }
 
-  const ticketUrl = (participant: Participant) =>
-    `${window.location.origin}/ticket/${participant.registration_number}`
-
-  const filtered = participants.filter((p) => {
-    if (selectedEvent !== 'all' && p.event_id !== selectedEvent) return false
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      return (
-        p.name.toLowerCase().includes(q) ||
-        p.email.toLowerCase().includes(q) ||
-        (p.registration_number || '').toLowerCase().includes(q)
-      )
-    }
-    return true
-  })
+  const ticketUrl = (p: Participant) => `${window.location.origin}/ticket/${p.registration_number}`
 
   const statusBadge = (status: string) => {
     switch (status) {
@@ -118,6 +115,8 @@ export default function TicketsPage() {
     }
   }
 
+  const totalPages = Math.ceil(total / PER_PAGE)
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-8">Manajemen Tiket</h1>
@@ -125,19 +124,12 @@ export default function TicketsPage() {
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-          <input
-            type="text"
-            placeholder="Cari nama, email, atau no registrasi..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
+          <input type="text" placeholder="Cari nama, email, atau no registrasi..." value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
+            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
-        <select
-          value={selectedEvent}
-          onChange={(e) => setSelectedEvent(e.target.value)}
-          className="px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        >
+        <select value={selectedEvent} onChange={(e) => { setSelectedEvent(e.target.value); setPage(1) }}
+          className="px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
           <option value="all">Semua Event</option>
           {events.map((ev) => (
             <option key={ev.id} value={ev.id}>{ev.title}</option>
@@ -147,7 +139,7 @@ export default function TicketsPage() {
 
       {loading ? (
         <TableSkeleton />
-      ) : filtered.length === 0 ? (
+      ) : participants.length === 0 ? (
         <div className="text-center py-20 text-gray-500">Tidak ada data peserta</div>
       ) : (
         <div className="overflow-x-auto">
@@ -162,7 +154,7 @@ export default function TicketsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
+              {participants.map((p) => (
                 <tr key={p.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                   <td className="py-3 px-4">
                     <div>
@@ -176,47 +168,35 @@ export default function TicketsPage() {
                   <td className="py-3 px-4">{statusBadge(p.status)}</td>
                   <td className="py-3 px-4">
                     {p.payment_proof_url ? (
-                      <a
-                        href={p.payment_proof_url}
-                        target="_blank"
-                        className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300"
-                      >
-                        <ExternalLink size={14} />
-                        Lihat
+                      <a href={p.payment_proof_url} target="_blank"
+                        className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300">
+                        <ExternalLink size={14} /> Lihat
                       </a>
-                    ) : (
-                      <span className="text-gray-600">-</span>
-                    )}
+                    ) : <span className="text-gray-600">-</span>}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
                       {p.status === 'pending' && (
                         <>
-                          <Button size="sm" onClick={() => handleVerify(p)}>
-                            <CheckCircle size={14} className="mr-1" />
-                            Approve
+                          <Button size="sm" onClick={() => setApproveTarget(p)}>
+                            <CheckCircle size={14} className="mr-1" /> Approve
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleReject(p)}>
+                          <Button size="sm" variant="ghost" onClick={() => setRejectTarget(p)}>
                             <XCircle size={14} />
                           </Button>
                         </>
                       )}
                       {p.registration_number && (
                         <>
-                          <a
-                            href={getWaUrl(p.whatsapp, `Halo ${p.name}! Terima kasih telah mendaftar. Berikut tiket Anda: ${ticketUrl(p)}`)}
+                          <a href={getWaUrl(p.whatsapp, `Halo ${p.name}! Terima kasih telah mendaftar. Berikut tiket Anda: ${ticketUrl(p)}`)}
                             target="_blank"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors"
-                          >
-                            <Send size={14} />
-                            WA
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors">
+                            <Send size={14} /> WA
                           </a>
-                          <a
-                            href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi', `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors"
-                          >
-                            <Send size={14} />
-                            Email
+                          <a href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi',
+                            `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors">
+                            <Send size={14} /> Email
                           </a>
                         </>
                       )}
@@ -228,6 +208,28 @@ export default function TicketsPage() {
           </table>
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+
+      <ConfirmModal
+        open={!!approveTarget}
+        onClose={() => setApproveTarget(null)}
+        onConfirm={handleVerify}
+        title="Verifikasi Peserta"
+        message={`Approve pendaftaran "${approveTarget?.name}"? Tiket akan dibuat otomatis.`}
+        confirmText="Approve"
+        variant="warning"
+      />
+
+      <ConfirmModal
+        open={!!rejectTarget}
+        onClose={() => setRejectTarget(null)}
+        onConfirm={handleRejectConfirm}
+        title="Tolak Peserta"
+        message={`Tolak pendaftaran "${rejectTarget?.name}"? Bukti pembayaran akan dihapus.`}
+        confirmText="Tolak"
+        variant="danger"
+      />
     </div>
   )
 }

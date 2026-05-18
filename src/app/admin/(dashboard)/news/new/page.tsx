@@ -5,24 +5,20 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { RichTextEditor } from '@/components/editor/RichTextEditor'
 import { slugify } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function NewNewsPage() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({
-    title: '',
-    slug: '',
-    content: '',
-    tags: '',
-  })
+  const [form, setForm] = useState({ title: '', slug: '', content: '', tags: '' })
   const [thumbnail, setThumbnail] = useState<File | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
     try {
       let thumbnail_url = ''
       if (thumbnail) {
@@ -38,11 +34,10 @@ export default function NewNewsPage() {
         title: form.title,
         slug: form.slug,
         content: form.content,
-        tags: form.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
+        tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
         thumbnail_url,
         is_active: true,
       })
-
       if (error) throw error
 
       await supabase.from('audit_logs').insert({
@@ -51,10 +46,11 @@ export default function NewNewsPage() {
         details: `Membuat berita baru: ${form.title}`,
       })
 
+      toast.success('Berita berhasil dibuat')
       router.push('/admin/news')
       router.refresh()
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Terjadi kesalahan')
+      toast.error(err instanceof Error ? err.message : 'Gagal membuat berita')
     } finally {
       setLoading(false)
     }
@@ -63,7 +59,6 @@ export default function NewNewsPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-white mb-8">Tambah Berita Baru</h1>
-
       <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           label="Judul"
@@ -71,34 +66,13 @@ export default function NewNewsPage() {
           onChange={(e) => setForm({ ...form, title: e.target.value, slug: slugify(e.target.value) })}
           required
         />
-        <Input
-          label="Slug"
-          value={form.slug}
-          onChange={(e) => setForm({ ...form, slug: e.target.value })}
-          required
-        />
-        <Input
-          label="Tags (pisahkan dengan koma)"
-          value={form.tags}
-          onChange={(e) => setForm({ ...form, tags: e.target.value })}
-          placeholder="musik, konser, komunitas"
-        />
+        <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
+        <Input label="Tags (pisahkan dengan koma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="musik, konser, komunitas" />
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-300">Konten (HTML)</label>
-          <textarea
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            rows={12}
-            className="w-full px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"
-          />
+          <label className="block text-sm font-medium text-gray-300">Konten</label>
+          <RichTextEditor content={form.content} onChange={(html) => setForm({ ...form, content: html })} placeholder="Tulis berita di sini..." />
         </div>
-        <Input
-          label="Thumbnail"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
-        />
-
+        <Input label="Thumbnail" type="file" accept="image/*" onChange={(e) => setThumbnail(e.target.files?.[0] || null)} />
         <div className="flex gap-4">
           <Button type="submit" loading={loading}>Simpan</Button>
           <Button type="button" variant="ghost" onClick={() => router.back()}>Batal</Button>

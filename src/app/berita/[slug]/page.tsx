@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
+import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
 import { notFound } from 'next/navigation'
@@ -66,9 +67,9 @@ export default async function NewsDetailPage({ params }: Props) {
             </div>
           )}
 
-          <div
+          <SanitizedHtml
             className="prose prose-invert prose-emerald max-w-none"
-            dangerouslySetInnerHTML={{ __html: news.content }}
+            html={news.content}
           />
 
           <div className="mt-12 pt-8 border-t border-white/10">

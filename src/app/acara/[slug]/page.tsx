@@ -1,6 +1,7 @@
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
 import { RegistrationForm } from '@/components/events/RegistrationForm'
+import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -63,9 +64,9 @@ export default async function EventDetailPage({ params }: Props) {
             )}
 
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{event.title}</h1>
-            <div
+            <SanitizedHtml
               className="prose prose-invert prose-emerald max-w-none text-gray-400"
-              dangerouslySetInnerHTML={{ __html: event.description }}
+              html={event.description}
             />
 
             {sponsors && sponsors.length > 0 && (

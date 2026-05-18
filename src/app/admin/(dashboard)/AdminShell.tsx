@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Menu } from 'lucide-react'
+import { Toaster } from '@/components/ui/Toaster'
 import type { UserRole } from '@/types'
 
 interface AdminShellProps {
@@ -65,6 +66,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
           {children}
         </main>
       </div>
+      <Toaster />
     </div>
   )
 }

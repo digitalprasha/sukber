@@ -1,21 +1,30 @@
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
 import { NewsCard } from '@/components/news/NewsCard'
+import { PaginationLinks } from '@/components/ui/PaginationLinks'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
+
+const PER_PAGE = 9
 
 export const metadata: Metadata = {
   title: 'Berita',
   description: 'Berita dan kegiatan terbaru dari SukaBernyanyi Sukabumi',
 }
 
-export default async function NewsPage() {
+export default async function NewsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageStr } = await searchParams
+  const page = Math.max(1, parseInt(pageStr || '1'))
   const supabase = await createServerSupabaseClient()
-  const { data: news } = await supabase
+
+  const { data: news, count } = await supabase
     .from('news')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: false })
+    .range((page - 1) * PER_PAGE, page * PER_PAGE - 1)
+
+  const totalPages = Math.ceil((count || 0) / PER_PAGE)
 
   return (
     <>
@@ -39,6 +48,8 @@ export default async function NewsPage() {
             <NewsCard key={item.id} news={item} />
           ))}
         </div>
+
+        <PaginationLinks page={page} totalPages={totalPages} basePath="/berita" />
       </main>
       <Footer />
     </>
