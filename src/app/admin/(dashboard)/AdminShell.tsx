@@ -49,7 +49,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--background)]">
+    <div className="flex min-h-screen bg-[var(--background)] admin-dashboard">
       <div className="hidden lg:flex h-screen sticky top-0">
         <AdminSidebar collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} role={role} />
       </div>
@@ -64,7 +64,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-40 bg-[var(--background)]/80 backdrop-blur-lg border-b border-white/10">
+        <header className="sticky top-0 z-40 bg-[var(--color-header-bg)] backdrop-blur-lg border-b border-[var(--color-card-border)]">
           <div className="flex items-center justify-between px-4 lg:px-8 h-16">
             <div className="flex items-center gap-4">
               <button
@@ -92,8 +92,8 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-white/10 bg-[#0f0f1a] shadow-2xl shadow-black/50 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-white/10">
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-[var(--color-card-border)] bg-[var(--color-dropdown-bg)] shadow-2xl shadow-black/50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-[var(--color-card-border)]">
                     <p className="text-sm text-white truncate">{email}</p>
                     <p className="text-xs text-gray-500 capitalize">{ROLE_LABELS[role] || role}</p>
                   </div>

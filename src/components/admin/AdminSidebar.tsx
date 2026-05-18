@@ -53,11 +53,11 @@ export function AdminSidebar({
 
   return (
     <aside className={cn(
-      'h-full bg-[var(--background)] border-r border-white/10 flex flex-col transition-all duration-300',
+      'h-full bg-[var(--background)] border-r border-[var(--color-card-border)] flex flex-col transition-all duration-300',
       collapsed ? 'w-16' : 'w-64'
     )}>
       <div className={cn(
-        'border-b border-white/10 shrink-0 flex items-center h-16',
+        'border-b border-[var(--color-card-border)] shrink-0 flex items-center h-16',
         collapsed ? 'justify-center px-0' : 'justify-between px-4'
       )}>
         <a href="/admin" className={cn(collapsed ? 'mx-auto' : '')}>
@@ -69,7 +69,7 @@ export function AdminSidebar({
           </button>
         )}
         {collapsed && (
-          <button onClick={onToggleCollapse} className="absolute -right-3 top-5 bg-[#0a0a14] border border-white/10 rounded-full p-1 text-gray-500 hover:text-white transition-colors shadow" title="Perluas menu">
+          <button onClick={onToggleCollapse} className="absolute -right-3 top-5 bg-[var(--background)] border border-[var(--color-card-border)] rounded-full p-1 text-gray-500 hover:text-white transition-colors shadow" title="Perluas menu">
             <PanelRightOpen size={14} />
           </button>
         )}
