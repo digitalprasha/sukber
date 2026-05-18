@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Mail, Shield, Key } from 'lucide-react'
+import { Plus, Pencil, Trash2, Mail } from 'lucide-react'
 import type { Staff, UserRole } from '@/types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -23,17 +23,13 @@ const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
 export default function PenggunaPage() {
   const [staff, setStaff] = useState<Staff[]>([])
   const [loading, setLoading] = useState(true)
-
   const [showAdd, setShowAdd] = useState(false)
   const [addEmail, setAddEmail] = useState('')
   const [addRole, setAddRole] = useState<UserRole>('panitia')
-  const [addPassword, setAddPassword] = useState('')
   const [adding, setAdding] = useState(false)
-
   const [editId, setEditId] = useState<string | null>(null)
   const [editRole, setEditRole] = useState<UserRole>('panitia')
   const [editing, setEditing] = useState(false)
-
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -51,18 +47,13 @@ export default function PenggunaPage() {
     const res = await fetch('/api/admin/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: addEmail, role: addRole, password: addPassword || undefined }),
+      body: JSON.stringify({ email: addEmail, role: addRole }),
     })
     setAdding(false)
-    if (!res.ok) {
-      const { error } = await res.json()
-      toast.error(error)
-      return
-    }
+    if (!res.ok) { const { error } = await res.json(); toast.error(error); return }
     toast.success('Staff berhasil ditambahkan')
     setShowAdd(false)
     setAddEmail('')
-    setAddPassword('')
     fetchStaff()
   }
 
@@ -112,7 +103,6 @@ export default function PenggunaPage() {
             <tr className="border-b border-white/10 bg-white/5">
               <th className="text-left px-4 py-3 text-sm text-gray-400 font-medium">Email</th>
               <th className="text-left px-4 py-3 text-sm text-gray-400 font-medium">Role</th>
-              <th className="text-left px-4 py-3 text-sm text-gray-400 font-medium">Auth</th>
               <th className="text-left px-4 py-3 text-sm text-gray-400 font-medium">Sejak</th>
               <th className="text-right px-4 py-3 text-sm text-gray-400 font-medium">Aksi</th>
             </tr>
@@ -129,31 +119,27 @@ export default function PenggunaPage() {
                 <td className="px-4 py-3">
                   {editId === s.id ? (
                     <div className="flex items-center gap-2">
-                      <select
-                        value={editRole}
-                        onChange={e => setEditRole(e.target.value as UserRole)}
-                        className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-sm text-white"
-                      >
-                        {ROLE_OPTIONS.map(o => (
-                          <option key={o.value} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <select
+                          value={editRole}
+                          onChange={e => setEditRole(e.target.value as UserRole)}
+                          className="appearance-none bg-[#1a1a2e] border border-white/20 rounded-xl px-4 py-2 pr-8 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all cursor-pointer"
+                        >
+                          {ROLE_OPTIONS.map(o => (
+                            <option key={o.value} value={o.value} className="bg-[#1a1a2e] text-white">{o.label}</option>
+                          ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
                       <Button size="sm" loading={editing} onClick={() => handleEdit(s.id)}>Simpan</Button>
                       <Button size="sm" variant="ghost" onClick={() => setEditId(null)}>Batal</Button>
                     </div>
                   ) : (
                     <span className="text-sm text-gray-300">{ROLE_LABELS[s.role]}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {s.password_enabled ? (
-                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
-                      <Key className="w-3 h-3" /> Password
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300">
-                      <Shield className="w-3 h-3" /> Google
-                    </span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-500">
@@ -163,19 +149,13 @@ export default function PenggunaPage() {
                   <div className="flex items-center justify-end gap-1">
                     {editId !== s.id && (
                       <>
-                        <button
-                          onClick={() => { setEditId(s.id); setEditRole(s.role) }}
-                          className="p-2 text-gray-500 hover:text-white transition-colors"
-                          title="Ubah role"
-                        >
+                        <button onClick={() => { setEditId(s.id); setEditRole(s.role) }}
+                          className="p-2 text-gray-500 hover:text-white transition-colors" title="Ubah role">
                           <Pencil className="w-4 h-4" />
                         </button>
                         {s.is_deletable && (
-                          <button
-                            onClick={() => setDeleteId(s.id)}
-                            className="p-2 text-gray-500 hover:text-rose-400 transition-colors"
-                            title="Hapus"
-                          >
+                          <button onClick={() => setDeleteId(s.id)}
+                            className="p-2 text-gray-500 hover:text-rose-400 transition-colors" title="Hapus">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
@@ -197,38 +177,24 @@ export default function PenggunaPage() {
             <form onSubmit={handleAdd} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1.5">Email</label>
-                <input
-                  type="email"
-                  value={addEmail}
-                  onChange={e => setAddEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50"
-                  required
-                />
+                <input type="email" value={addEmail} onChange={e => setAddEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50" required />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1.5">Role</label>
-                <select
-                  value={addRole}
-                  onChange={e => setAddRole(e.target.value as UserRole)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500/50"
-                >
-                  {ROLE_OPTIONS.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1.5">
-                  Password <span className="text-gray-600">(opsional, kosongi untuk login Google)</span>
-                </label>
-                <input
-                  type="password"
-                  value={addPassword}
-                  onChange={e => setAddPassword(e.target.value)}
-                  placeholder="Minimal 6 karakter"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50"
-                  minLength={6}
-                />
+                <div className="relative">
+                  <select value={addRole} onChange={e => setAddRole(e.target.value as UserRole)}
+                    className="appearance-none w-full bg-[#1a1a2e] border border-white/20 rounded-xl px-4 py-2.5 pr-10 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all cursor-pointer">
+                    {ROLE_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value} className="bg-[#1a1a2e] text-white">{o.label}</option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <Button type="button" variant="ghost" onClick={() => setShowAdd(false)}>Batal</Button>

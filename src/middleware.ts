@@ -21,19 +21,8 @@ export async function middleware(request: NextRequest) {
     || request.headers.get('x-real-ip')
     || '127.0.0.1'
 
-  const pathname = request.nextUrl.pathname
-  const isAuthApi = pathname.startsWith('/api/auth/')
-  const isApi = pathname.startsWith('/api/')
-
-  if (isAuthApi) {
-    const allowed = rateLimit(`auth:${ip}`, 5, 15000)
-    if (!allowed) {
-      return new NextResponse(JSON.stringify({ error: 'Too many attempts. Silakan tunggu 15 detik.' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json', 'Retry-After': '15' },
-      })
-    }
-  } else if (isApi) {
+  const isApi = request.nextUrl.pathname.startsWith('/api/')
+  if (isApi) {
     const allowed = rateLimit(ip, 30, 10000)
     if (!allowed) {
       return new NextResponse(JSON.stringify({ error: 'Too many requests' }), {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { X, LogIn } from 'lucide-react'
@@ -11,6 +11,8 @@ const links = [
   { href: '/berita', label: 'Berita' },
   { href: '/acara', label: 'Acara' },
   { href: '/#gallery', label: 'Galeri' },
+  { href: '/#partners', label: 'Mitra' },
+  { href: '/#faq', label: 'FAQ' },
 ]
 
 function MusicNoteIcon() {
@@ -36,12 +38,25 @@ function MusicNoteCloseIcon() {
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#060a08]/80 backdrop-blur-2xl border-b border-white/[0.03]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
+    <nav className={cn(
+      'fixed top-0 left-0 right-0 z-50 bg-[#060a08]/80 backdrop-blur-2xl border-b border-white/[0.03] transition-all duration-300',
+      scrolled ? 'shadow-lg shadow-black/20' : ''
+    )}>
+      <div className={cn(
+        'max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between transition-all duration-300',
+        scrolled ? 'h-16' : 'h-20'
+      )}>
         <Link href="/" className="flex-shrink-0 block relative">
-          <div className="relative w-[62px] h-[62px] sm:w-[90px] sm:h-[90px]">
+          <div className={cn('relative transition-all duration-300', scrolled ? 'w-[48px] h-[48px] sm:w-[64px] sm:h-[64px]' : 'w-[62px] h-[62px] sm:w-[90px] sm:h-[90px]')}>
             <Image
               src="/logo.png"
               alt="SukaBernyanyi"

@@ -62,7 +62,6 @@ export interface Staff {
   email: string
   role: 'admin' | 'super_admin' | 'developer' | 'scanner' | 'panitia'
   is_deletable: boolean
-  password_enabled: boolean
   created_at: string
 }
 

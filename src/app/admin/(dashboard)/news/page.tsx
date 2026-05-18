@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2, Search } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { Toggle } from '@/components/ui/Toggle'
 import { toast } from 'sonner'
 
 const PER_PAGE = 10
@@ -43,6 +44,13 @@ export default function AdminNewsPage() {
   }
 
   useEffect(() => { loadNews() }, [page, search])
+
+  async function handleToggleActive(item: any) {
+    const { error } = await supabase.from('news').update({ is_active: !item.is_active }).eq('id', item.id)
+    if (error) { toast.error(error.message); return }
+    toast.success(item.is_active ? 'Berita dinonaktifkan' : 'Berita diaktifkan')
+    loadNews()
+  }
 
   async function handleDelete() {
     if (!deleteTarget) return
@@ -95,9 +103,7 @@ export default function AdminNewsPage() {
                 <h3 className="font-medium text-white truncate">{item.title}</h3>
                 <p className="text-sm text-gray-500">{formatDate(item.created_at)}</p>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${item.is_active ? 'bg-green-500/20 text-green-300' : 'bg-rose-600/20 text-rose-300'}`}>
-                {item.is_active ? 'Aktif' : 'Nonaktif'}
-              </span>
+              <Toggle checked={!!item.is_active} onChange={() => handleToggleActive(item)} />
               <button onClick={() => setDeleteTarget(item)} className="p-2 rounded-lg hover:bg-rose-500/10 text-gray-400 hover:text-rose-300 transition-colors">
                 <Trash2 size={16} />
               </button>

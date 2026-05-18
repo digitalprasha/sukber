@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
-import { Plus, Trash2, Image, Video, Search } from 'lucide-react'
+import { Toggle } from '@/components/ui/Toggle'
+import { Plus, Trash2, Image, Video } from 'lucide-react'
 import { toast } from 'sonner'
 
 const PER_PAGE = 12
@@ -28,6 +29,13 @@ export default function AdminGalleryPage() {
     loaded.current = true
     loadGallery()
   }, [page])
+
+  async function handleToggleActive(item: any) {
+    const { error } = await supabase.from('gallery').update({ is_active: !item.is_active }).eq('id', item.id)
+    if (error) { toast.error(error.message); return }
+    toast.success(item.is_active ? 'Galeri disembunyikan' : 'Galeri ditampilkan')
+    loadGallery()
+  }
 
   useEffect(() => { loadGallery() }, [page])
 
@@ -52,7 +60,7 @@ export default function AdminGalleryPage() {
       const data = await res.json()
       url = data.url
     }
-    await supabase.from('gallery').insert({ type: form.type, url, caption: form.caption })
+    await supabase.from('gallery').insert({ type: form.type, url, caption: form.caption, is_active: true })
     await supabase.from('audit_logs').insert({
       action: 'ADD_GALLERY',
       details: `Menambah galeri: ${form.caption}`,
@@ -88,7 +96,7 @@ export default function AdminGalleryPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-2xl bg-white/5 border border-white/10 p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="rounded-2xl bg-white/5 border border-white/10 p-6 mb-6 space-y-4 max-w-lg">
           <div className="flex gap-3">
             <button type="button" onClick={() => setForm({ ...form, type: 'image' })}
               className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${form.type === 'image' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
@@ -128,7 +136,11 @@ export default function AdminGalleryPage() {
                 ) : (
                   <img src={item.url} alt={item.caption} className="w-full h-full object-cover" />
                 )}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/70">{item.is_active ? 'Tampil' : 'Sembunyi'}</span>
+                    <Toggle checked={!!item.is_active} onChange={() => handleToggleActive(item)} />
+                  </div>
                   <button onClick={() => setDeleteTarget(item)} className="p-2 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 transition-colors">
                     <Trash2 size={18} />
                   </button>

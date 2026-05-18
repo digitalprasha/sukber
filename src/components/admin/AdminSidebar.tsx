@@ -15,6 +15,8 @@ import {
   Users,
   PanelLeftClose,
   PanelRightOpen,
+  HelpCircle,
+  Handshake,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { UserRole } from '@/types'
@@ -24,6 +26,8 @@ const navItems = [
   { href: '/admin/events', label: 'Events', icon: Calendar },
   { href: '/admin/news', label: 'Berita', icon: Newspaper },
   { href: '/admin/gallery', label: 'Galeri', icon: ImageIcon },
+  { href: '/admin/faqs', label: 'FAQ', icon: HelpCircle },
+  { href: '/admin/partners', label: 'Partners', icon: Handshake },
   { href: '/admin/tickets', label: 'Tickets', icon: Ticket },
   { href: '/admin/scanner', label: 'Scanner', icon: QrCode },
   { href: '/admin/pengguna', label: 'Pengguna', icon: Users, adminOnly: true },
@@ -49,7 +53,7 @@ export function AdminSidebar({
 
   return (
     <aside className={cn(
-      'h-full bg-[#0a0a14] border-r border-white/10 flex flex-col transition-all duration-300',
+      'h-full bg-[var(--background)] border-r border-white/10 flex flex-col transition-all duration-300',
       collapsed ? 'w-16' : 'w-64'
     )}>
       <div className={cn(

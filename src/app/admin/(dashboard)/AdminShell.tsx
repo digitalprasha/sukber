@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Menu, LogOut } from 'lucide-react'
 import { Toaster } from '@/components/ui/Toaster'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import type { UserRole } from '@/types'
 
 const ROLE_LABELS: Record<string, string> = {
@@ -25,7 +26,7 @@ interface AdminShellProps {
 export function AdminShell({ children, email, role }: AdminShellProps) {
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
@@ -48,7 +49,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0f0f1a]">
+    <div className="flex min-h-screen bg-[var(--background)]">
       <div className="hidden lg:flex h-screen sticky top-0">
         <AdminSidebar collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} role={role} />
       </div>
@@ -63,7 +64,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-40 bg-[#0f0f1a]/80 backdrop-blur-lg border-b border-white/10">
+        <header className="sticky top-0 z-40 bg-[var(--background)]/80 backdrop-blur-lg border-b border-white/10">
           <div className="flex items-center justify-between px-4 lg:px-8 h-16">
             <div className="flex items-center gap-4">
               <button
@@ -77,7 +78,9 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
               </p>
             </div>
 
-            <div className="relative" ref={dropdownRef}>
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -103,6 +106,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </header>

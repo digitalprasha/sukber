@@ -13,31 +13,16 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { email, role, password } = await request.json()
+  const { email, role } = await request.json()
   const supabase = createAdminClient()
 
   if (!email || !role) {
     return NextResponse.json({ error: 'Email dan role harus diisi' }, { status: 400 })
   }
 
-  if (password) {
-    const { error: authError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    })
-    if (authError) {
-      return NextResponse.json({ error: authError.message }, { status: 500 })
-    }
-  }
-
   const { data, error } = await supabase
     .from('staff')
-    .insert({
-      email,
-      role,
-      password_enabled: !!password,
-    })
+    .insert({ email, role })
     .select()
     .single()
 
@@ -99,20 +84,12 @@ export async function DELETE(request: NextRequest) {
 
   const { data: staff, error: fetchError } = await supabase
     .from('staff')
-    .select('email, password_enabled, is_deletable')
+    .select('email, is_deletable')
     .eq('id', id)
     .single()
 
   if (fetchError) return NextResponse.json({ error: 'Staff tidak ditemukan' }, { status: 404 })
   if (!staff.is_deletable) return NextResponse.json({ error: 'Staff ini tidak bisa dihapus' }, { status: 403 })
-
-  if (staff.password_enabled) {
-    const { data: users } = await supabase.auth.admin.listUsers()
-    const authUser = users?.users?.find(u => u.email === staff.email)
-    if (authUser) {
-      await supabase.auth.admin.deleteUser(authUser.id)
-    }
-  }
 
   const { error } = await supabase.from('staff').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

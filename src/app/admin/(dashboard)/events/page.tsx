@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { Toggle } from '@/components/ui/Toggle'
 import { Plus, Pencil, Trash2, RotateCcw, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -51,6 +52,18 @@ export default function AdminEventsPage() {
       setDeleteTarget(null)
       loadEvents()
     }
+  }
+
+  async function handleToggleActive(item: any) {
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle_active', id: item.id, is_active: !item.is_active, user_email: user?.email }),
+    })
+    if (!res.ok) { toast.error('Gagal mengubah status'); return }
+    toast.success(item.is_active ? 'Event dinonaktifkan' : 'Event diaktifkan')
+    loadEvents()
   }
 
   async function handleReset() {
@@ -106,6 +119,7 @@ export default function AdminEventsPage() {
                 <h3 className="font-medium text-white truncate">{event.title}</h3>
                 <p className="text-sm text-gray-500">/{event.slug}</p>
               </div>
+              <Toggle checked={!!event.is_active} onChange={() => handleToggleActive(event)} />
               <button onClick={() => setDeleteTarget(event)} className="p-2 rounded-lg hover:bg-rose-500/10 text-gray-400 hover:text-rose-300 transition-colors" title="Hapus event">
                 <Trash2 size={16} />
               </button>

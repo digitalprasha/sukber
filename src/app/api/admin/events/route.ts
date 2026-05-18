@@ -54,6 +54,17 @@ export async function PUT(request: NextRequest) {
     const { action, ...data } = body
     const supabase = createAdminClient()
 
+    if (action === 'toggle_active') {
+      const { error } = await supabase.from('events').update({ is_active: data.is_active }).eq('id', data.id)
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      await supabase.from('audit_logs').insert({
+        user_email: data.user_email || 'unknown',
+        action: 'TOGGLE_EVENT',
+        details: `${data.is_active ? 'Mengaktifkan' : 'Menonaktifkan'} event: ${data.title}`,
+      })
+      return NextResponse.json({ success: true })
+    }
+
     if (action === 'update_event') {
       const { error } = await supabase.from('events').update(data.fields).eq('id', data.id)
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
