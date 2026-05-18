@@ -20,7 +20,7 @@ export function Navigation() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#060a08]/90 backdrop-blur-xl border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/" className="flex-shrink-0 flex items-center">
-          <Image src="/logo.png" alt="SukaBernyanyi" width={180} height={55} className="h-12 w-auto" priority />
+          <Image src="/logo.png" alt="SukaBernyanyi" width={180} height={55} className="h-10 sm:h-12 w-auto" priority />
         </Link>
 
         <div className="hidden md:flex items-center gap-10 ml-12">

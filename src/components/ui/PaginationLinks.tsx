@@ -24,7 +24,7 @@ export function PaginationLinks({ page, totalPages, basePath }: PaginationLinksP
   }
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 mt-8">
       {page > 1 && (
         <Link href={href(page - 1)} className="p-2 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-all">
           <ChevronLeft size={18} />
@@ -37,7 +37,7 @@ export function PaginationLinks({ page, totalPages, basePath }: PaginationLinksP
           <Link
             key={p}
             href={href(p)}
-            className={`min-w-[36px] h-9 flex items-center justify-center rounded-xl text-sm font-medium transition-all ${
+            className={`min-w-[32px] sm:min-w-[36px] h-8 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
               p === page
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'

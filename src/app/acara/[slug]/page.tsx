@@ -47,7 +47,7 @@ export default async function EventDetailPage({ params }: Props) {
     <>
       <Navigation />
       <main className="pt-24 pb-20 px-4">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-12">
           <div>
             {event.flyer_url ? (
               <div className="rounded-2xl overflow-hidden mb-6">
