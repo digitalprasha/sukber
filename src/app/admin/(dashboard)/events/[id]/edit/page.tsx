@@ -211,12 +211,18 @@ export default function EditEventPage() {
                     <img src={sp.preview} alt="Preview logo sponsor" className="mt-2 h-10 w-auto rounded-lg border border-white/10" />
                   )}
                 </div>
-                <Input
-                  label="Nama (admin saja)"
-                  value={sp.name}
-                  onChange={(e) => updateSponsor(idx, { name: e.target.value })}
-                  placeholder="Nama sponsor"
-                />
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Nama Sponsor{' '}
+                    <em className="text-rose-400 text-[11px] not-italic">*hanya terlihat oleh admin</em>
+                  </label>
+                  <input
+                    value={sp.name}
+                    onChange={(e) => updateSponsor(idx, { name: e.target.value })}
+                    placeholder="Nama sponsor"
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
+                  />
+                </div>
               </div>
               <button type="button" onClick={() => removeSponsor(idx)} className="p-1.5 rounded-lg hover:bg-rose-500/10 text-gray-500 hover:text-rose-300 transition-colors mt-6">
                 <X size={16} />

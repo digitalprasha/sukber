@@ -72,8 +72,8 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
               >
                 <Menu size={24} />
               </button>
-              <p className="text-sm text-white hidden sm:block">
-                Selamat Datang, <span className="font-semibold text-emerald-300">{ROLE_LABELS[role] || role}</span>
+              <p className="text-xs sm:text-sm text-white hidden sm:block">
+                SELAMAT DATANG, ANDA LOGIN SEBAGAI <span className="font-semibold text-emerald-300 uppercase">{ROLE_LABELS[role] || role}</span>
               </p>
             </div>
 

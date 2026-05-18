@@ -57,7 +57,7 @@ export function AdminSidebar({
         collapsed ? 'justify-center px-0' : 'justify-between px-4'
       )}>
         <a href="/admin" className={cn(collapsed ? 'mx-auto' : '')}>
-          <Image src="/logo.png" alt="SukaBernyanyi" width={32} height={32} className="shrink-0" />
+          <Image src="/logo.png" alt="SukaBernyanyi" width={collapsed ? 32 : 90} height={collapsed ? 32 : 90} className="shrink-0" />
         </a>
         {!collapsed && (
           <button onClick={onToggleCollapse} className="text-gray-500 hover:text-white transition-colors p-1" title="Perkecil menu">
@@ -73,7 +73,9 @@ export function AdminSidebar({
 
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {visibleItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+          const isActive = item.href === '/admin'
+            ? pathname === '/admin'
+            : (pathname === item.href || pathname.startsWith(item.href + '/'))
           return (
             <a
               key={item.href}
