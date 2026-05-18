@@ -195,13 +195,20 @@ export function ParallaxHero() {
           </h1>
         </div>
 
-        <p
-          className="text-base sm:text-lg md:text-xl text-gray-500/90 mb-12 max-w-2xl mx-auto leading-relaxed font-light tracking-wide animate-fade-in"
-          style={{ animationDelay: '0.5s' }}
+        <div
+          className="space-y-3 mb-12 animate-fade-in"
+          style={{ animationDelay: '0.4s' }}
         >
-          Bersama kita berkarya, bernyanyi, dan berbagi kebahagiaan
-          melalui harmoni nada di Sukabumi.
-        </p>
+          <p className="text-emerald-300/80 text-lg sm:text-xl md:text-2xl font-semibold tracking-wide">
+            Sukabumi Satu Harmoni
+          </p>
+          <p className="text-amber-400/70 text-sm sm:text-base md:text-lg italic">
+            &ldquo;Gak harus Penyanyi, yang penting MAU nyanyi&rdquo;
+          </p>
+          <p className="text-emerald-400/40 text-xs sm:text-sm tracking-widest uppercase font-mono">
+            #MicONPressureOFF
+          </p>
+        </div>
 
         <div
           className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
