@@ -9,6 +9,7 @@ const links = [
   { href: '/', label: 'Beranda' },
   { href: '/berita', label: 'Berita' },
   { href: '/acara', label: 'Acara' },
+  { href: '/#gallery', label: 'Galeri' },
 ]
 
 export function Navigation() {

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { AlertCircle, CheckCircle, Scan, Search } from 'lucide-react'
+import { AlertCircle, CheckCircle, Scan, Search, Camera, CameraOff } from 'lucide-react'
 import type { Participant } from '@/types'
 
 export default function ScannerPage() {
@@ -17,7 +17,51 @@ export default function ScannerPage() {
   } | null>(null)
   const [participant, setParticipant] = useState<Participant | null>(null)
   const [loading, setLoading] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const [cameraError, setCameraError] = useState('')
+  const scannerRef = useRef<HTMLDivElement>(null)
+  const html5QrCodeRef = useRef<any>(null)
+
+  useEffect(() => {
+    return () => {
+      if (html5QrCodeRef.current) {
+        try { html5QrCodeRef.current.stop() } catch {}
+      }
+    }
+  }, [])
+
+  const startScanner = async () => {
+    setCameraError('')
+    setScanning(true)
+
+    try {
+      const { Html5Qrcode } = await import('html5-qrcode')
+      const scanner = new Html5Qrcode('qr-reader')
+      html5QrCodeRef.current = scanner
+
+      await scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText: string) => {
+          const regNumber = decodedText.trim().split('/').pop() || decodedText.trim()
+          handleCheckIn(regNumber)
+          scanner.stop().catch(() => {})
+          setScanning(false)
+        },
+        () => {}
+      )
+    } catch (err: any) {
+      setCameraError(err?.message || 'Gagal mengakses kamera')
+      setScanning(false)
+    }
+  }
+
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current) {
+      try { await html5QrCodeRef.current.stop() } catch {}
+      html5QrCodeRef.current = null
+    }
+    setScanning(false)
+  }
 
   async function handleCheckIn(regNumber: string) {
     setLoading(true)
@@ -37,7 +81,7 @@ export default function ScannerPage() {
     }
 
     if (data.is_checked_in) {
-      setResult({ type: 'warning', message: 'TICKET ALREADY USED!' })
+      setResult({ type: 'warning', message: 'TICKET SUDAH DIGUNAKAN!' })
       setParticipant(data)
       setLoading(false)
       return
@@ -74,24 +118,26 @@ export default function ScannerPage() {
       <h1 className="text-2xl font-bold text-white mb-8 text-center">QR Scanner</h1>
 
       <div className="rounded-2xl bg-white/5 border border-white/10 p-6 mb-6">
-        <div className="aspect-square max-w-sm mx-auto bg-black/50 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
-          {scanning ? (
-            <video ref={videoRef} className="w-full h-full object-cover" />
-          ) : (
-            <div className="text-center text-gray-500">
-              <Scan size={48} className="mx-auto mb-2" />
-              <p className="text-sm">Kamera siap memindai</p>
-            </div>
-          )}
-        </div>
+        <div id="qr-reader" ref={scannerRef} className="aspect-square max-w-sm mx-auto bg-black/50 rounded-xl overflow-hidden mb-4" />
 
-        <Button
-          onClick={() => setScanning(!scanning)}
-          variant={scanning ? 'danger' : 'primary'}
-          className="w-full"
-        >
-          {scanning ? 'Stop Scanner' : 'Mulai Scan QR'}
-        </Button>
+        {cameraError && (
+          <div className="flex items-center gap-2 text-sm text-rose-400 mb-4">
+            <AlertCircle size={16} />
+            {cameraError}
+          </div>
+        )}
+
+        {!scanning ? (
+          <Button onClick={startScanner} className="w-full">
+            <Camera size={18} className="mr-2" />
+            Mulai Scan QR
+          </Button>
+        ) : (
+          <Button onClick={stopScanner} variant="danger" className="w-full">
+            <CameraOff size={18} className="mr-2" />
+            Stop Scanner
+          </Button>
+        )}
       </div>
 
       <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
@@ -114,21 +160,21 @@ export default function ScannerPage() {
         <div
           className={`mt-6 rounded-2xl p-6 border ${
             result.type === 'success'
-              ? 'bg-green-500/10 border-green-500/20'
+              ? 'bg-emerald-500/10 border-emerald-500/20'
               : result.type === 'warning'
-              ? 'bg-rose-600/10 border-rose-500/20 animate-pulse'
-              : 'bg-rose-600/10 border-rose-500/20'
+              ? 'bg-rose-500/10 border-rose-500/20 animate-pulse'
+              : 'bg-rose-500/10 border-rose-500/20'
           }`}
         >
           <div className="flex items-center gap-3 mb-3">
             {result.type === 'success' ? (
-              <CheckCircle className="text-green-400" size={24} />
+              <CheckCircle className="text-emerald-400" size={24} />
             ) : (
               <AlertCircle className="text-rose-400" size={24} />
             )}
             <span
               className={`font-semibold ${
-                result.type === 'success' ? 'text-green-300' : 'text-rose-300'
+                result.type === 'success' ? 'text-emerald-300' : 'text-rose-300'
               }`}
             >
               {result.message}
