@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Righteous } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/Toaster";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 
 const geistSans = Geist({
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   icons: {
     icon: '/logo.png',
+    shortcut: '/logo.png',
     apple: '/logo.png',
   },
   openGraph: {
@@ -45,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${geistSans.variable} ${geistMono.variable} ${righteous.variable}`}>
-      <body className="min-h-screen antialiased">{children}<Toaster /></body>
+      <body className="min-h-screen antialiased">{children}<Toaster /><ScrollToTop /></body>
     </html>
   );
 }

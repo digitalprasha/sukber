@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import { Music2, LogIn } from 'lucide-react'
+import Image from 'next/image'
 
 function useMousePosition() {
   const [pos, setPos] = useState({ x: 0, y: 0 })
@@ -71,8 +71,8 @@ export default function AdminLoginPage() {
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
 
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-amber-600 mb-5 shadow-lg shadow-emerald-500/20 ring-1 ring-white/10">
-              <Music2 className="text-white" size={28} />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-amber-500/20 mb-5 shadow-lg shadow-emerald-500/10 ring-1 ring-white/10 p-3">
+              <Image src="/logo.png" alt="SukaBernyanyi" width={80} height={80} className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Login</h1>
             <p className="text-gray-500 mt-2 text-sm">SukaBernyanyi Sukabumi</p>
