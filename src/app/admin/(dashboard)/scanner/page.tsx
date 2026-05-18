@@ -87,21 +87,25 @@ export default function ScannerPage() {
       return
     }
 
-    const { error } = await supabase
-      .from('participants')
-      .update({ is_checked_in: true, status: 'checked_in' })
-      .eq('id', data.id)
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'check_in',
+        id: data.id,
+        name: data.name,
+        reg_number: regNumber,
+        user_email: user?.email,
+      }),
+    })
 
-    if (error) {
-      setResult({ type: 'error', message: error.message })
+    if (!res.ok) {
+      const err = await res.json()
+      setResult({ type: 'error', message: err.error || 'Gagal check-in' })
     } else {
       setResult({ type: 'success', message: 'Check-in berhasil!' })
       setParticipant({ ...data, is_checked_in: true })
-
-      await supabase.from('audit_logs').insert({
-        action: 'CHECK_IN',
-        details: `Check-in peserta: ${data.name} (${regNumber})`,
-      })
     }
     setLoading(false)
   }

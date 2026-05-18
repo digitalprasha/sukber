@@ -66,20 +66,25 @@ export default function TicketsPage() {
       (p) => p.event_id === approveTarget.event_id && p.registration_number
     ).length
 
-    const regNumber = `${event.ticket_prefix}${String(count + 1).padStart(3, '0')}`
-    const { error } = await supabase.from('participants').update({
-      status: 'verified', registration_number: regNumber,
-    }).eq('id', approveTarget.id)
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'verify_participant',
+        id: approveTarget.id,
+        name: approveTarget.name,
+        ticket_prefix: event.ticket_prefix,
+        current_count: count,
+        user_email: user?.email,
+      }),
+    })
+    const result = await res.json()
 
-    if (error) {
-      toast.error(error.message)
+    if (!res.ok) {
+      toast.error(result.error || 'Gagal verifikasi')
     } else {
-      await supabase.from('audit_logs').insert({
-        user_email: (await supabase.auth.getUser()).data.user?.email,
-        action: 'VERIFY_PARTICIPANT',
-        details: `Verifikasi peserta ${approveTarget.name} - No: ${regNumber}`,
-      })
-      toast.success(`${approveTarget.name} berhasil diverifikasi — ${regNumber}`)
+      toast.success(`${approveTarget.name} berhasil diverifikasi — ${result.registration_number}`)
       setApproveTarget(null)
       reload()
     }
@@ -87,18 +92,22 @@ export default function TicketsPage() {
 
   async function handleRejectConfirm() {
     if (!rejectTarget) return
-    const { error } = await supabase.from('participants').update({
-      status: 'pending', payment_proof_url: '',
-    }).eq('id', rejectTarget.id)
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'reject_participant',
+        id: rejectTarget.id,
+        name: rejectTarget.name,
+        user_email: user?.email,
+      }),
+    })
 
-    if (error) {
-      toast.error(error.message)
+    if (!res.ok) {
+      const result = await res.json()
+      toast.error(result.error || 'Gagal menolak')
     } else {
-      await supabase.from('audit_logs').insert({
-        user_email: (await supabase.auth.getUser()).data.user?.email,
-        action: 'REJECT_PARTICIPANT',
-        details: `Menolak peserta ${rejectTarget.name}`,
-      })
       toast.success(`Peserta ${rejectTarget.name} ditolak`)
       setRejectTarget(null)
       reload()
