@@ -1,8 +1,15 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
-  return await updateSession(request)
+  const response = await updateSession(request)
+
+  response.headers.set(
+    'Content-Security-Policy',
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https: http:; object-src 'none';"
+  )
+
+  return response
 }
 
 export const config = {
