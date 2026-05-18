@@ -197,5 +197,6 @@ CREATE POLICY "Participants update admin" ON event_management.participants
 -- Insert default staff accounts
 INSERT INTO public.staff (id, email, role, is_deletable)
 VALUES
-  ('00000000-0000-0000-0000-000000000001', 'digitalprasha@gmail.com', 'super_admin', false)
+  ('00000000-0000-0000-0000-000000000001', 'admin@sukabernyanyi.my.id', 'super_admin', false),
+  ('00000000-0000-0000-0000-000000000002', 'digitalprasha@gmail.com', 'developer', false)
 ON CONFLICT (email) DO NOTHING;
