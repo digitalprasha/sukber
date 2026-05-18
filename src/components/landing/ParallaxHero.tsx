@@ -169,7 +169,7 @@ export function ParallaxHero() {
         </div>
 
         <div className="space-y-2 mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <h1 className="text-7xl sm:text-8xl lg:text-[10rem] font-black leading-none tracking-tighter">
+          <h1 className="text-7xl sm:text-8xl lg:text-[10rem] leading-none tracking-tight" style={{ fontFamily: 'var(--font-righteous)' }}>
             <span className="bg-gradient-to-r from-emerald-300 via-emerald-200 to-emerald-400 bg-clip-text text-transparent block">
               Suka
             </span>
