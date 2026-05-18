@@ -74,11 +74,10 @@ export default async function EventDetailPage({ params }: Props) {
                 <h3 className="font-semibold text-white mb-4">Sponsor</h3>
                 <div className="flex flex-wrap gap-4">
                   {sponsors.map((s) => (
-                    <div key={s.id} className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+                    <div key={s.id} className="flex items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/10">
                       {s.logo_url && (
-                        <img src={s.logo_url} alt={s.name} className="h-8 w-auto" />
+                        <img src={s.logo_url} alt="" className="h-10 md:h-12 w-auto object-contain" />
                       )}
-                      <span className="text-sm text-gray-400">{s.name}</span>
                     </div>
                   ))}
                 </div>
