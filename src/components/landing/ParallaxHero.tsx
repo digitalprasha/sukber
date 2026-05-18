@@ -142,12 +142,12 @@ export function ParallaxHero() {
       </div>
 
       {/* Sound wave visualization */}
-      <div className="absolute inset-0 z-[1]" style={parallaxStyle(0.1)}>
+      <div className="absolute inset-0 z-[1]" style={parallaxStyle(0.15)}>
         <SoundWave />
       </div>
 
       {/* Floating notes layer */}
-      <div className="absolute inset-0 z-[2]" style={parallaxStyle(0.2)}>
+      <div className="absolute inset-0 z-[2]" style={parallaxStyle(0.4)}>
         {Array.from({ length: 12 }).map((_, i) => (
           <FloatingNote
             key={i}
@@ -209,7 +209,7 @@ export function ParallaxHero() {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#060a08] to-transparent z-20" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#0a0f0d] via-[#0a0f0d]/80 to-transparent z-20" />
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-fade-in" style={{ animationDelay: '1.2s' }}>
