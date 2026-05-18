@@ -35,7 +35,7 @@ export async function EventSection() {
         <div className="text-center mt-8">
           <Link
             href="/acara"
-            className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+            className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
           >
             Lihat Semua Acara
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

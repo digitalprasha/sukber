@@ -23,7 +23,7 @@ export default async function LogsPage() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-8">
-        <History className="text-purple-400" size={24} />
+        <History className="text-emerald-400" size={24} />
         <h1 className="text-2xl font-bold text-white">Activity Logs</h1>
       </div>
 
@@ -52,7 +52,7 @@ export default async function LogsPage() {
                 <td className="py-3 px-4 text-gray-400 whitespace-nowrap">{formatDate(log.timestamp)}</td>
                 <td className="py-3 px-4 text-white">{log.user_email}</td>
                 <td className="py-3 px-4">
-                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300">
+                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300">
                     {log.action}
                   </span>
                 </td>

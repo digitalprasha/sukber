@@ -48,7 +48,7 @@ export default async function NewsDetailPage({ params }: Props) {
             <div className="flex items-center gap-3 mb-4">
               <time className="text-sm text-gray-500">{formatDate(news.created_at)}</time>
               {news.tags?.map((tag: string) => (
-                <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
                   {tag}
                 </span>
               ))}
@@ -67,14 +67,14 @@ export default async function NewsDetailPage({ params }: Props) {
           )}
 
           <div
-            className="prose prose-invert prose-purple max-w-none"
+            className="prose prose-invert prose-emerald max-w-none"
             dangerouslySetInnerHTML={{ __html: news.content }}
           />
 
           <div className="mt-12 pt-8 border-t border-white/10">
             <Link
               href="/berita"
-              className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
             >
               <svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />

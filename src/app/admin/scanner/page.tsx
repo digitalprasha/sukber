@@ -102,7 +102,7 @@ export default function ScannerPage() {
             placeholder="SBS001"
             value={manualRegNumber}
             onChange={(e) => setManualRegNumber(e.target.value.toUpperCase())}
-            className="flex-1 px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="flex-1 px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
           <Button type="submit" loading={loading}>
             <Search size={18} />
@@ -116,19 +116,19 @@ export default function ScannerPage() {
             result.type === 'success'
               ? 'bg-green-500/10 border-green-500/20'
               : result.type === 'warning'
-              ? 'bg-red-500/10 border-red-500/20 animate-pulse'
-              : 'bg-red-500/10 border-red-500/20'
+              ? 'bg-rose-600/10 border-rose-500/20 animate-pulse'
+              : 'bg-rose-600/10 border-rose-500/20'
           }`}
         >
           <div className="flex items-center gap-3 mb-3">
             {result.type === 'success' ? (
               <CheckCircle className="text-green-400" size={24} />
             ) : (
-              <AlertCircle className="text-red-400" size={24} />
+              <AlertCircle className="text-rose-400" size={24} />
             )}
             <span
               className={`font-semibold ${
-                result.type === 'success' ? 'text-green-300' : 'text-red-300'
+                result.type === 'success' ? 'text-green-300' : 'text-rose-300'
               }`}
             >
               {result.message}

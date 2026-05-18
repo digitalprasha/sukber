@@ -16,12 +16,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
           {
-            'bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white shadow-lg shadow-purple-500/25':
+            'bg-gradient-to-r from-emerald-600 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-white shadow-lg shadow-emerald-500/25':
               variant === 'primary',
             'bg-white/10 hover:bg-white/20 text-white border border-white/20':
               variant === 'secondary',
             'bg-transparent hover:bg-white/10 text-white': variant === 'ghost',
-            'bg-red-600 hover:bg-red-500 text-white': variant === 'danger',
+            'bg-rose-600 hover:bg-rose-500 text-white': variant === 'danger',
           },
           {
             'px-3 py-1.5 text-sm': size === 'sm',

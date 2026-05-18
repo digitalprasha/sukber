@@ -29,7 +29,7 @@ export function SponsorSection({ sponsors }: SponsorSectionProps) {
         {sponsors.map((sponsor) => (
           <div
             key={sponsor.id}
-            className="relative group flex items-center justify-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-500/30 transition-all duration-300"
+            className="relative group flex items-center justify-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all duration-300"
             onMouseEnter={() => setHoveredId(sponsor.id)}
             onMouseLeave={() => setHoveredId(null)}
           >

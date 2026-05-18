@@ -57,14 +57,14 @@ export default async function EventDetailPage({ params }: Props) {
                 />
               </div>
             ) : (
-              <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center mb-6">
+              <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center mb-6">
                 <span className="text-8xl">🎤</span>
               </div>
             )}
 
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{event.title}</h1>
             <div
-              className="prose prose-invert prose-purple max-w-none text-gray-400"
+              className="prose prose-invert prose-emerald max-w-none text-gray-400"
               dangerouslySetInnerHTML={{ __html: event.description }}
             />
 

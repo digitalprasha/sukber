@@ -106,7 +106,7 @@ export function RegistrationForm({ eventId }: RegistrationFormProps) {
         <label className="block text-sm font-medium text-gray-300">
           Upload Bukti Pembayaran
         </label>
-        <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-white/20 bg-white/5 hover:bg-white/10 hover:border-purple-500/50 transition-all cursor-pointer">
+        <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-white/20 bg-white/5 hover:bg-white/10 hover:border-emerald-500/50 transition-all cursor-pointer">
           <div className="flex flex-col items-center gap-2 text-gray-400">
             <Upload size={24} />
             <span className="text-sm">{file ? file.name : 'Klik untuk upload'}</span>
@@ -123,7 +123,7 @@ export function RegistrationForm({ eventId }: RegistrationFormProps) {
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-400">
+        <div className="flex items-center gap-2 text-sm text-rose-400">
           <AlertCircle size={16} />
           {error}
         </div>

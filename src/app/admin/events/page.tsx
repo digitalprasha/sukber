@@ -14,7 +14,7 @@ export default async function AdminEventsPage() {
         <h1 className="text-2xl font-bold text-white">Events</h1>
         <a
           href="/admin/events/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl text-white text-sm font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-amber-500 rounded-xl text-white text-sm font-medium"
         >
           <Plus size={18} />
           Tambah Event
@@ -34,7 +34,7 @@ export default async function AdminEventsPage() {
             {event.flyer_url ? (
               <img src={event.flyer_url} alt="" className="w-16 h-16 rounded-xl object-cover" />
             ) : (
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center">
                 <span className="text-2xl">🎤</span>
               </div>
             )}

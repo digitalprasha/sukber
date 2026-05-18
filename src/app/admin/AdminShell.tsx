@@ -54,7 +54,7 @@ export function AdminShell({ children, email, role }: AdminShellProps) {
                 <p className="text-sm text-white">{email}</p>
                 <p className="text-xs text-gray-500 capitalize">{role}</p>
               </div>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-medium text-white">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-amber-500 flex items-center justify-center text-sm font-medium text-white">
                 {email[0].toUpperCase()}
               </div>
             </div>

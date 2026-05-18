@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3">
+            <div className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent mb-3">
               <Music2 size={24} />
               SukaBernyanyi
             </div>
@@ -20,8 +20,8 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-white mb-3">Navigasi</h3>
             <div className="space-y-2 text-sm text-gray-500">
-              <Link href="/berita" className="block hover:text-purple-400 transition-colors">Berita</Link>
-              <Link href="/acara" className="block hover:text-purple-400 transition-colors">Acara</Link>
+              <Link href="/berita" className="block hover:text-emerald-400 transition-colors">Berita</Link>
+              <Link href="/acara" className="block hover:text-emerald-400 transition-colors">Acara</Link>
             </div>
           </div>
 

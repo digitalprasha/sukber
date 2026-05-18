@@ -31,19 +31,19 @@ export default async function TicketPage({ params }: Props) {
   const qrDataUrl = await QRCode.toDataURL(ticketUrl, {
     width: 300,
     margin: 2,
-    color: { dark: '#7c3aed', light: '#00000000' },
+    color: { dark: '#059669', light: '#00000000' },
   })
 
   return (
     <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <Music2 className="text-purple-400 mx-auto mb-2" size={32} />
+          <Music2 className="text-emerald-400 mx-auto mb-2" size={32} />
           <h1 className="text-xl font-bold text-white">SukaBernyanyi</h1>
           <p className="text-gray-500 text-sm">Tiket Masuk</p>
         </div>
 
-        <div className="rounded-2xl bg-gradient-to-br from-purple-900/50 to-pink-900/50 border border-purple-500/30 p-6 text-center">
+        <div className="rounded-2xl bg-gradient-to-br from-emerald-900/50 to-amber-900/50 border border-emerald-500/30 p-6 text-center">
           {participant.status === 'checked_in' && (
             <div className="flex items-center justify-center gap-2 mb-4 px-4 py-2 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-sm font-medium">
               <CheckCircle size={16} />
@@ -61,7 +61,7 @@ export default async function TicketPage({ params }: Props) {
             <p className="text-sm text-gray-400">{participant.events?.title}</p>
           </div>
 
-          <div className="border-t border-purple-500/20 pt-4 text-xs text-gray-500">
+          <div className="border-t border-emerald-500/20 pt-4 text-xs text-gray-500">
             <p>Tunjukkan QR ini di pintu masuk</p>
           </div>
         </div>

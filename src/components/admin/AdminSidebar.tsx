@@ -31,8 +31,8 @@ export function AdminSidebar({ onSignOut }: { onSignOut: () => void }) {
     <aside className="w-64 min-h-screen bg-[#0a0a14] border-r border-white/10 flex flex-col">
       <div className="p-6 border-b border-white/10">
         <a href="/admin" className="flex items-center gap-2 text-lg font-bold">
-          <Music2 className="text-purple-400" size={24} />
-          <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <Music2 className="text-emerald-400" size={24} />
+          <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">
             Admin
           </span>
         </a>
@@ -48,7 +48,7 @@ export function AdminSidebar({ onSignOut }: { onSignOut: () => void }) {
               className={cn(
                 'flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20'
+                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                   : 'text-gray-500 hover:text-white hover:bg-white/5'
               )}
             >
@@ -62,7 +62,7 @@ export function AdminSidebar({ onSignOut }: { onSignOut: () => void }) {
       <div className="p-4 border-t border-white/10">
         <button
           onClick={onSignOut}
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-red-400 hover:bg-red-500/10 w-full transition-all duration-200"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-rose-400 hover:bg-rose-600/10 w-full transition-all duration-200"
         >
           <LogOut size={18} />
           Sign Out

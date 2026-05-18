@@ -35,13 +35,13 @@ export function ParallaxHero() {
         className="absolute inset-0 z-0"
         style={{ willChange: 'transform' }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/40 via-transparent to-[#0f0f1a]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-700/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/40 via-transparent to-[#0f0f1a]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-700/20 via-transparent to-transparent" />
 
         {notes.map(({ Icon, x, delay, size }, i) => (
           <div
             key={i}
-            className="absolute text-purple-400/20 animate-float"
+            className="absolute text-emerald-400/20 animate-float"
             style={{
               left: x,
               top: `${20 + (i * 8)}%`,
@@ -55,12 +55,12 @@ export function ParallaxHero() {
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm mb-6">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm mb-6">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
           Komunitas Musik Sukabumi
         </div>
 
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400 bg-clip-text text-transparent">
           SukaBernyanyi
         </h1>
 
@@ -73,7 +73,7 @@ export function ParallaxHero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="#berita"
-            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl font-medium text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 hover:scale-105"
+            className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-amber-500 rounded-xl font-medium text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105"
           >
             Lihat Berita
           </a>

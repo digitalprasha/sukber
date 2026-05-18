@@ -10,7 +10,7 @@ export function NewsCard({ news }: NewsCardProps) {
   return (
     <Link
       href={`/berita/${news.slug}`}
-      className="group block rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10"
+      className="group block rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10"
     >
       {news.thumbnail_url ? (
         <div className="aspect-video overflow-hidden">
@@ -21,7 +21,7 @@ export function NewsCard({ news }: NewsCardProps) {
           />
         </div>
       ) : (
-        <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center">
+        <div className="aspect-video bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center">
           <span className="text-4xl">🎵</span>
         </div>
       )}
@@ -30,12 +30,12 @@ export function NewsCard({ news }: NewsCardProps) {
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs text-gray-500">{formatDate(news.created_at)}</span>
           {news.tags && news.tags.length > 0 && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
               {news.tags[0]}
             </span>
           )}
         </div>
-        <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors line-clamp-2">
+        <h3 className="font-semibold text-white group-hover:text-emerald-300 transition-colors line-clamp-2">
           {news.title}
         </h3>
         <p className="text-sm text-gray-500 mt-2 line-clamp-2">

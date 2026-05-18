@@ -13,7 +13,7 @@ export default async function AdminDashboard() {
     ])
 
   const stats = [
-    { label: 'Total Events', value: eventsCount || 0, icon: Calendar, color: 'from-purple-500 to-pink-500' },
+    { label: 'Total Events', value: eventsCount || 0, icon: Calendar, color: 'from-emerald-500 to-amber-500' },
     { label: 'Total Berita', value: newsCount || 0, icon: Newspaper, color: 'from-blue-500 to-cyan-500' },
     { label: 'Pending Tickets', value: pendingTickets || 0, icon: Ticket, color: 'from-yellow-500 to-orange-500' },
     { label: 'Total Peserta', value: participantsCount || 0, icon: Users, color: 'from-green-500 to-emerald-500' },
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
             href="/admin/events/new"
             className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
           >
-            <Calendar size={20} className="text-purple-400" />
+            <Calendar size={20} className="text-emerald-400" />
             <span className="text-sm text-white">Buat Event Baru</span>
           </a>
           <a

@@ -9,7 +9,7 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Link
       href={`/acara/${event.slug}`}
-      className="group block rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10"
+      className="group block rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10"
     >
       {event.flyer_url ? (
         <div className="aspect-[3/4] overflow-hidden">
@@ -20,20 +20,20 @@ export function EventCard({ event }: EventCardProps) {
           />
         </div>
       ) : (
-        <div className="aspect-[3/4] bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center">
+        <div className="aspect-[3/4] bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center">
           <span className="text-6xl">🎤</span>
         </div>
       )}
 
       <div className="p-4 space-y-3">
-        <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors line-clamp-2">
+        <h3 className="font-semibold text-white group-hover:text-emerald-300 transition-colors line-clamp-2">
           {event.title}
         </h3>
         <p className="text-sm text-gray-500 line-clamp-2">
           {event.description.replace(/<[^>]*>/g, '').slice(0, 100)}
         </p>
         <div className="pt-2">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl text-white text-sm font-medium group-hover:shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-amber-500 rounded-xl text-white text-sm font-medium group-hover:shadow-lg group-hover:shadow-emerald-500/25 transition-all duration-300">
             Daftar Sekarang
           </span>
         </div>

@@ -55,10 +55,10 @@ export default function SettingsPage() {
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold text-white mb-8">Pengaturan</h1>
 
-      <div className="rounded-2xl bg-red-500/5 border border-red-500/20 p-6">
+      <div className="rounded-2xl bg-rose-600/5 border border-rose-500/20 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Shield className="text-red-400" size={24} />
-          <h2 className="text-lg font-semibold text-red-300">Reset Data Event Management</h2>
+          <Shield className="text-rose-400" size={24} />
+          <h2 className="text-lg font-semibold text-rose-300">Reset Data Event Management</h2>
         </div>
 
         <p className="text-gray-400 text-sm mb-6">
@@ -92,7 +92,7 @@ export default function SettingsPage() {
         </div>
 
         {result && (
-          <div className={`mt-4 flex items-center gap-2 text-sm ${result.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+          <div className={`mt-4 flex items-center gap-2 text-sm ${result.type === 'success' ? 'text-green-400' : 'text-rose-400'}`}>
             {result.type === 'success' ? <CheckCircle size={16} /> : <AlertTriangle size={16} />}
             {result.message}
           </div>

@@ -15,7 +15,7 @@ export default async function AdminNewsPage() {
         <h1 className="text-2xl font-bold text-white">Berita</h1>
         <a
           href="/admin/news/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl text-white text-sm font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-amber-500 rounded-xl text-white text-sm font-medium"
         >
           <Plus size={18} />
           Tambah Berita
@@ -35,7 +35,7 @@ export default async function AdminNewsPage() {
             {item.thumbnail_url ? (
               <img src={item.thumbnail_url} alt="" className="w-16 h-16 rounded-xl object-cover" />
             ) : (
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center">
                 <span className="text-2xl">🎵</span>
               </div>
             )}
@@ -43,7 +43,7 @@ export default async function AdminNewsPage() {
               <h3 className="font-medium text-white truncate">{item.title}</h3>
               <p className="text-sm text-gray-500">{formatDate(item.created_at)}</p>
             </div>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${item.is_active ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${item.is_active ? 'bg-green-500/20 text-green-300' : 'bg-rose-600/20 text-rose-300'}`}>
               {item.is_active ? 'Aktif' : 'Nonaktif'}
             </span>
             <a
