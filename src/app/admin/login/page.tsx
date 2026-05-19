@@ -39,6 +39,13 @@ export default function AdminLoginPage() {
     const err = params.get('error')
     if (err === 'auth_failed') setError('Gagal masuk. Silakan coba lagi.')
     if (err === 'session_expired') setError('Sesi berakhir. Silakan login ulang.')
+    if (err === 'not_authorized') {
+      setError('AKUN ANDA TIDAK TERDAFTAR!')
+      setTimeout(() => {
+        setError('')
+        window.history.replaceState({}, '', '/admin/login')
+      }, 6000)
+    }
   }, [])
 
   const handleGoogleLogin = async () => {
@@ -81,8 +88,18 @@ export default function AdminLoginPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm text-center">
-              {error}
+            <div className={`mb-4 p-4 rounded-xl text-sm text-center ${error === 'AKUN ANDA TIDAK TERDAFTAR!' ? 'bg-rose-500/15 border-2 border-rose-500/40' : 'bg-rose-500/10 border border-rose-500/20 text-rose-300'}`}>
+              {error === 'AKUN ANDA TIDAK TERDAFTAR!' ? (
+                <div>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <svg className="w-5 h-5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                    <span className="font-bold text-rose-300 text-base">AKUN ANDA TIDAK TERDAFTAR!</span>
+                  </div>
+                  <p className="text-rose-400/80 text-xs">Email ini tidak memiliki akses ke panel admin. Hubungi administrator jika Anda yakin seharusnya memiliki akses.</p>
+                </div>
+              ) : (
+                error
+              )}
             </div>
           )}
 

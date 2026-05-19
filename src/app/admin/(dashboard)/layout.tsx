@@ -21,7 +21,8 @@ export default async function AdminLayout({
     .single()
 
   if (!staff) {
-    redirect('/admin/login')
+    await supabase.auth.signOut()
+    redirect('/admin/login?error=not_authorized')
   }
 
   return <AdminShell email={user.email} role={staff.role}>{children}</AdminShell>

@@ -8,7 +8,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { TableSkeleton } from '@/components/ui/Skeleton'
 import { getWaUrl, getMailtoUrl } from '@/lib/utils'
-import { CheckCircle, XCircle, Send, ExternalLink, Search } from 'lucide-react'
+import { CheckCircle, XCircle, Send, ExternalLink, Search, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 
 const PER_PAGE = 15
@@ -30,6 +30,8 @@ export default function TicketsPage() {
   const [total, setTotal] = useState(0)
   const [approveTarget, setApproveTarget] = useState<Participant | null>(null)
   const [rejectTarget, setRejectTarget] = useState<Participant | null>(null)
+  const [rejectReason, setRejectReason] = useState('')
+  const [rejectLoading, setRejectLoading] = useState(false)
   const loaded = useRef(false)
 
   const reload = () => {
@@ -91,7 +93,11 @@ export default function TicketsPage() {
   }
 
   async function handleRejectConfirm() {
-    if (!rejectTarget) return
+    if (!rejectTarget || !rejectReason.trim()) {
+      toast.error('Harap isi alasan penolakan')
+      return
+    }
+    setRejectLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     const res = await fetch('/api/admin/tickets', {
       method: 'POST',
@@ -107,9 +113,20 @@ export default function TicketsPage() {
     if (!res.ok) {
       const result = await res.json()
       toast.error(result.error || 'Gagal menolak')
+      setRejectLoading(false)
     } else {
       toast.success(`Peserta ${rejectTarget.name} ditolak`)
+
+      const waText = `Hi ${rejectTarget.name},\n\nPendaftaran Anda ditolak dengan alasan:\n${rejectReason}\n\nSilakan daftar ulang dengan data yang benar.\n\nTerima kasih.`
+      const emailSubject = 'Pendaftaran Ditolak - SukaBernyanyi'
+      const emailBody = `Hi ${rejectTarget.name},\n\nPendaftaran Anda ditolak dengan alasan:\n${rejectReason}\n\nSilakan daftar ulang dengan data yang benar.\n\nTerima kasih.`
+
+      window.open(getWaUrl(rejectTarget.whatsapp, waText), '_blank')
+      window.open(getMailtoUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
+
       setRejectTarget(null)
+      setRejectReason('')
+      setRejectLoading(false)
       reload()
     }
   }
@@ -230,15 +247,38 @@ export default function TicketsPage() {
         variant="warning"
       />
 
-      <ConfirmModal
-        open={!!rejectTarget}
-        onClose={() => setRejectTarget(null)}
-        onConfirm={handleRejectConfirm}
-        title="Tolak Peserta"
-        message={`Tolak pendaftaran "${rejectTarget?.name}"? Bukti pembayaran akan dihapus.`}
-        confirmText="Tolak"
-        variant="danger"
-      />
+      {rejectTarget && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => !rejectLoading && setRejectTarget(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a1a12] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-4">
+              <div className="mx-auto w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-3">
+                <AlertTriangle className="text-rose-400" size={24} />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-1">Tolak {rejectTarget.name}</h3>
+              <p className="text-sm text-gray-400">Bukti pembayaran akan dihapus. Peserta harus daftar ulang.</p>
+            </div>
+            <textarea
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+              placeholder="Tulis alasan penolakan..."
+              rows={4}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none text-sm mb-4"
+            />
+            <p className="text-xs text-gray-500 mb-4">Alasan akan dikirim via WhatsApp & Email ke peserta.</p>
+            <div className="flex gap-3">
+              <button onClick={() => { setRejectTarget(null); setRejectReason('') }} disabled={rejectLoading}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium disabled:opacity-50">
+                Batal
+              </button>
+              <button onClick={handleRejectConfirm} disabled={rejectLoading || !rejectReason.trim()}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-medium hover:bg-rose-500 transition-all disabled:opacity-50">
+                {rejectLoading ? 'Memproses...' : 'Tolak & Kirim Pesan'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
