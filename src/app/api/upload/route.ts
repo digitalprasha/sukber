@@ -36,8 +36,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    return NextResponse.json({ url: `${siteUrl}/api/files/${folder}/${filename}` })
+    const host = request.headers.get('host') || 'localhost:3000'
+    const protocol = host.includes('localhost') || host.includes('127.0.0.1') ? 'http' : 'https'
+    const baseUrl = `${protocol}://${host}`
+    return NextResponse.json({ url: `${baseUrl}/api/files/${folder}/${filename}` })
   } catch (err: unknown) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Upload failed' }, { status: 500 })
   }
