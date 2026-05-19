@@ -160,8 +160,18 @@ export default function EditEventPage() {
           <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Informasi Event</h3>
           <Input label="Judul Event" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value, slug: slugify(e.target.value) })} required />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
-            <Input label="Prefix Tiket" value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })} required />
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Slug</label>
+              <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" required />
+              <p className="text-[11px] text-gray-600 mt-1">Identifikasi unik untuk URL, contoh: <span className="text-gray-500">/acara/</span><span className="text-emerald-400">vol-8-sukabumi</span>. Otomatis terisi dari judul.</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Kode Event</label>
+              <input value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })}
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" required />
+              <p className="text-[11px] text-gray-600 mt-1">Kode singkat event, contoh: <span className="text-emerald-400">VOL8</span>. Hasil akhir nomor registrasi: <span className="text-emerald-400">SBS-VOL8-001</span></p>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Flyer / Poster</label>

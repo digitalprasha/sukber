@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (action === 'verify_participant') {
       const count = data.current_count || 0
-      const regNumber = `${data.ticket_prefix}${String(count + 1).padStart(3, '0')}`
+      const regNumber = `SBS-${data.ticket_prefix}-${String(count + 1).padStart(3, '0')}`
       const { error } = await supabase.from('participants').update({
         status: 'verified',
         registration_number: regNumber,
