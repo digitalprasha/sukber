@@ -116,6 +116,18 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
+    if (action === 'delete_sponsors') {
+      const keepIds = data.keep_ids || []
+      if (keepIds.length > 0) {
+        const { error } = await supabase.from('sponsors').delete().eq('event_id', data.event_id).not('id', 'in', `(${keepIds.join(',')})`)
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      } else {
+        const { error } = await supabase.from('sponsors').delete().eq('event_id', data.event_id)
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      }
+      return NextResponse.json({ success: true })
+    }
+
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
   } catch (err: unknown) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Server error' }, { status: 500 })

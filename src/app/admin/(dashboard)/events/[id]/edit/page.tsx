@@ -117,18 +117,22 @@ export default function EditEventPage() {
       setLoading(false); return
     }
 
-    const existingIds = sponsors.filter(s => s.id).map(s => s.id!)
-    if (existingIds.length > 0) {
-      await supabase.from('sponsors').delete().eq('event_id', params.id).not('id', 'in', `(${existingIds.join(',')})`)
-    } else {
-      await supabase.from('sponsors').delete().eq('event_id', params.id)
-    }
+    const keepIds = sponsors.filter(s => s.id).map(s => s.id!)
+    const delRes = await fetch('/api/admin/events', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete_sponsors', event_id: params.id, keep_ids: keepIds, name: 'cleanup', user_email: user?.email }),
+    })
+    if (!delRes.ok) { toast.error('Gagal menghapus sponsor lama'); setLoading(false); return }
 
     for (const sp of sponsors) {
+      if (!sp.logo && !sp.id) continue
       let logo_url = sp.existing_logo_url || ''
       if (sp.logo) {
         const fd = new FormData(); fd.append('file', sp.logo); fd.append('type', 'sponsor')
-        logo_url = (await (await fetch('/api/upload', { method: 'POST', body: fd })).json()).url
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd })
+        if (!uploadRes.ok) throw new Error('Gagal upload logo sponsor')
+        logo_url = (await uploadRes.json()).url
       }
       if (sp.id) {
         await fetch('/api/admin/events', {
