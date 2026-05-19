@@ -10,6 +10,7 @@ const FIELDS = [
   { key: 'instagram', label: 'Instagram', placeholder: '@sukabernyanyi' },
   { key: 'email', label: 'Email', placeholder: 'info@sukabernyanyi.com' },
   { key: 'address', label: 'Alamat', placeholder: 'Sukabumi, Jawa Barat' },
+  { key: 'whatsapp', label: 'WhatsApp Admin', placeholder: '6281234567890' },
 ]
 
 export default function KontakPage() {

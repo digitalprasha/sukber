@@ -43,6 +43,7 @@ export async function Footer() {
             <div className="space-y-2 text-sm text-gray-500">
               <p>Instagram: {contact.instagram || '@sukabernyanyi'}</p>
               <p>Email: {contact.email || 'info@sukabernyanyi.com'}</p>
+              {contact.whatsapp && <p>WhatsApp: {contact.whatsapp}</p>}
               {contact.address && <p>{contact.address}</p>}
             </div>
           </div>
