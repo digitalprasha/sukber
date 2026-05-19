@@ -1,7 +1,4 @@
-'use client'
-
-import { useEffect, useState, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 interface Partner {
   id: string
@@ -18,18 +15,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   media_partner: 'Media Partner',
 }
 
-export function PartnersSection() {
-  const [partners, setPartners] = useState<Partner[]>([])
-  const scrollRef = useRef<HTMLDivElement>(null)
+export async function PartnersSection() {
+  const supabase = await createServerSupabaseClient()
+  const { data: partners } = await supabase
+    .from('partners')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
 
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.from('partners').select('*').eq('is_active', true).order('display_order', { ascending: true }).then(({ data }) => {
-      if (data) setPartners(data)
-    })
-  }, [])
-
-  if (partners.length === 0) return null
+  if (!partners || partners.length === 0) return null
 
   return (
     <section id="partners" className="py-20 px-4 overflow-hidden">
@@ -39,9 +33,9 @@ export function PartnersSection() {
           <p className="text-gray-400">Terima kasih kepada para mitra yang telah bekerja sama dengan kami</p>
         </div>
 
-        <div className="relative" ref={scrollRef}>
-          <div className="flex gap-8 md:gap-12 marquee-scroll" style={{ animationDuration: `${Math.max(partners.length * 3, 20)}s` }}>
-            {[...partners, ...partners].map((partner, i) => (
+        <div className="relative">
+          <div className="flex gap-8 md:gap-12 marquee-scroll" style={{ animationDuration: `${Math.max((partners?.length || 0) * 3, 20)}s` }}>
+            {[...(partners || []), ...(partners || [])].map((partner, i) => (
               <a
                 key={`${partner.id}-${i}`}
                 href={partner.website_url || '#'}
