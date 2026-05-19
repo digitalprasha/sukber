@@ -59,32 +59,78 @@
 }
 
 /* Light mode admin overrides */
+.light .admin-dashboard {
+  --color-card: #ffffff;
+  --color-card-border: #d1d5db;
+  --color-hover: rgba(0,0,0,0.04);
+  --color-dropdown-bg: #ffffff;
+  --color-input-bg: #ffffff;
+  --color-input-border: #d1d5db;
+}
+
 .light .admin-dashboard h1,
 .light .admin-dashboard h2,
 .light .admin-dashboard h3,
+.light .admin-dashboard h4,
 .light .admin-dashboard th,
-.light .admin-dashboard .text-white {
+.light .admin-dashboard label,
+.light .admin-dashboard .text-white,
+.light .admin-dashboard .text-white\/70,
+.light .admin-dashboard .text-white\/80,
+.light .admin-dashboard .font-semibold,
+.light .admin-dashboard .font-medium {
   color: #1f2937;
 }
-.light .admin-dashboard .text-gray-400,
-.light .admin-dashboard .text-gray-500,
-.light .admin-dashboard .text-gray-600 {
+
+.light .admin-dashboard .text-gray-200,
+.light .admin-dashboard .text-gray-300 {
+  color: #374151;
+}
+
+.light .admin-dashboard .text-gray-400 {
   color: #6b7280;
 }
+
+.light .admin-dashboard .text-gray-500 {
+  color: #9ca3af;
+}
+
+.light .admin-dashboard .text-gray-600 {
+  color: #9ca3af;
+}
+
 .light .admin-dashboard .bg-white\/5,
-.light .admin-dashboard .bg-white\/\[0\.02\] {
+.light .admin-dashboard .bg-white\/\[0\.02\],
+.light .admin-dashboard .bg-white\/\[0\.03\] {
   background-color: var(--color-card);
 }
+
+.light .admin-dashboard .bg-\[\#0f1a14\] {
+  background-color: var(--color-dropdown-bg);
+}
+
+.light .admin-dashboard .bg-\[\#1a1a2e\] {
+  background-color: #f9fafb;
+}
+
+.light .admin-dashboard .bg-\[\#0f0f1a\] {
+  background-color: var(--color-dropdown-bg);
+}
+
 .light .admin-dashboard .hover\:bg-white\/5:hover,
 .light .admin-dashboard .hover\:bg-white\/\[0\.02\]:hover,
 .light .admin-dashboard .hover\:bg-white\/10:hover {
   background-color: var(--color-hover);
 }
+
+.light .admin-dashboard .border-white\/5,
 .light .admin-dashboard .border-white\/10,
 .light .admin-dashboard .border-white\/20,
-.light .admin-dashboard .border-white\/\[0\.03\] {
+.light .admin-dashboard .border-white\/\[0\.03\],
+.light .admin-dashboard .border-white\/\[0\.06\] {
   border-color: var(--color-card-border);
 }
+
 .light .admin-dashboard input,
 .light .admin-dashboard textarea,
 .light .admin-dashboard select {
@@ -92,42 +138,51 @@
   border-color: var(--color-input-border) !important;
   color: #1f2937 !important;
 }
+
 .light .admin-dashboard input::placeholder,
 .light .admin-dashboard textarea::placeholder {
   color: #9ca3af !important;
 }
+
+.light .admin-dashboard .placeholder-gray-500::placeholder,
+.light .admin-dashboard .placeholder-gray-600::placeholder {
+  color: #9ca3af !important;
+}
+
 .light .admin-dashboard button:not(.bg-emerald-500):not(.bg-gradient-to-r):not(.bg-rose-500\/20):not(.bg-emerald-500\/10):not(.bg-rose-500\/10) {
   color: #374151;
 }
+
 .light .admin-dashboard .bg-\[var\(--background\)\] {
   background-color: var(--background);
 }
+
 .light .admin-dashboard table,
 .light .admin-dashboard tr {
   border-color: #e5e7eb;
 }
-.light .admin-dashboard td {
+
+.light .admin-dashboard td,
+.light .admin-dashboard .text-\[\#\#\] {
   color: #374151;
 }
-.light .admin-dashboard .bg-\[\#0f0f1a\] {
-  background-color: var(--color-dropdown-bg);
-}
-.light .admin-dashboard .bg-\[\#1a1a2e\] {
-  background-color: #f9fafb;
-}
-.light .admin-dashboard .placeholder-gray-600::placeholder {
-  color: #9ca3af !important;
-}
+
 .light .admin-dashboard .bg-rose-500\/10,
 .light .admin-dashboard .hover\:bg-rose-500\/10:hover,
 .light .admin-dashboard .hover\:bg-rose-600\/10:hover {
   background-color: rgba(239,68,68,0.08);
 }
+
 .light .admin-dashboard .bg-emerald-500\/10 {
   background-color: rgba(5,150,105,0.08);
 }
+
 .light .admin-dashboard .hover\:bg-white\/10:hover {
   background-color: var(--color-hover);
+}
+
+.light .admin-dashboard .hover\:text-white:hover {
+  color: #1f2937;
 }
 
 body {
