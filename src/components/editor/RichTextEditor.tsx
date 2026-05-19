@@ -1,15 +1,17 @@
 'use client'
 
+import { useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import ImageExtension from '@tiptap/extension-image'
 import LinkExtension from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import TextAlign from '@tiptap/extension-text-align'
+import Youtube from '@tiptap/extension-youtube'
 import {
   Bold, Italic, List, ListOrdered, Heading2, Heading3,
   Quote, Undo, Redo, Link as LinkIcon, Image, AlignLeft,
-  AlignCenter, AlignRight,
+  AlignCenter, AlignRight, Video, Loader2,
 } from 'lucide-react'
 
 interface RichTextEditorProps {
@@ -19,6 +21,9 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange, placeholder }: RichTextEditorProps) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const uploadingRef = useRef(false)
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -26,6 +31,7 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: placeholder || 'Tulis konten di sini...' }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      Youtube.configure({ inline: false, width: 640, height: 390 }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -42,16 +48,29 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
 
   const addLink = () => {
     const url = window.prompt('Masukkan URL:')
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run()
-    }
+    if (url) editor.chain().focus().setLink({ href: url }).run()
   }
 
-  const addImage = () => {
-    const url = window.prompt('Masukkan URL gambar:')
-    if (url) {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    uploadingRef.current = true
+
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('type', 'editor')
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    if (res.ok) {
+      const { url } = await res.json()
       editor.chain().focus().setImage({ src: url }).run()
     }
+    uploadingRef.current = false
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const addYoutube = () => {
+    const url = window.prompt('Masukkan URL YouTube:')
+    if (url) editor.chain().focus().setYoutubeVideo({ src: url }).run()
   }
 
   const ToolButton = ({ onClick, active, children }: { onClick: () => void; active?: boolean; children: React.ReactNode }) => (
@@ -66,6 +85,7 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
 
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
       <div className="flex flex-wrap items-center gap-0.5 px-2 py-2 border-b border-white/10 bg-white/[0.02]">
         <ToolButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')}>
           <Bold size={16} />
@@ -104,8 +124,11 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
         <ToolButton onClick={addLink} active={editor.isActive('link')}>
           <LinkIcon size={16} />
         </ToolButton>
-        <ToolButton onClick={addImage}>
-          <Image size={16} />
+        <ToolButton onClick={() => fileRef.current?.click()}>
+          {uploadingRef.current ? <Loader2 size={16} className="animate-spin" /> : <Image size={16} />}
+        </ToolButton>
+        <ToolButton onClick={addYoutube} active={editor.isActive('youtube')}>
+          <Video size={16} />
         </ToolButton>
         <div className="ml-auto flex items-center gap-0.5">
           <ToolButton onClick={() => editor.chain().focus().undo().run()}>
