@@ -53,7 +53,7 @@ export function PartnersSection() {
                 <img
                   src={partner.logo_url}
                   alt={partner.name}
-                  className="h-10 md:h-14 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                  className="h-10 md:h-14 w-auto object-contain transition-all duration-300"
                 />
                 <span className="text-xs text-gray-500 group-hover:text-emerald-300 transition-colors text-center whitespace-nowrap">{partner.name}</span>
               </a>
