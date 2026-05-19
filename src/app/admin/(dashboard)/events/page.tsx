@@ -85,6 +85,13 @@ export default function AdminEventsPage() {
   }
 
   async function handleExport(event: any) {
+    const confirmed = window.confirm(
+      '⚠️ DATA RAHASIA — File ini berisi data pribadi peserta (nama, email, WhatsApp) dan link bukti pembayaran.\n\n'
+      + 'Hanya untuk kebutuhan internal organisasi. DILARANG menyebarluaskan file ini ke pihak lain.\n\n'
+      + 'Lanjutkan download?'
+    )
+    if (!confirmed) return
+
     const res = await fetch('/api/admin/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -96,6 +103,8 @@ export default function AdminEventsPage() {
       toast.error('Belum ada peserta'); return
     }
 
+    const warning = '# FILE INI BERSIFAT RAHASIA — Hanya untuk kebutuhan internal organisasi.\n'
+      + '# Berisi data pribadi peserta dan link bukti pembayaran. DILARANG menyebarluaskan.\n\n'
     const header = 'Nama,Email,WhatsApp,No.Registrasi,Status,Check-In,Bukti Bayar,Tanggal Daftar'
     const rows = participants.map((p: any) =>
       [
@@ -106,7 +115,7 @@ export default function AdminEventsPage() {
       ].join(',')
     ).join('\n')
 
-    const blob = new Blob(['\ufeff' + header + '\n' + rows], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob(['\ufeff' + warning + header + '\n' + rows], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

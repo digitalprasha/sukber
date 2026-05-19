@@ -18,9 +18,13 @@ export async function POST(request: NextRequest) {
     const ext = 'jpg'
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-    const supabase = createAdminClient()
-    const folder = type === 'payment' ? 'payments' : type === 'flyer' ? 'flyers' : 'thumbnails'
+    const folderMap: Record<string, string> = {
+      payment: 'payments', flyer: 'flyers', thumbnail: 'thumbnails',
+      partner: 'partners', editor: 'editor', gallery: 'gallery', sponsor: 'sponsors',
+    }
+    const folder = folderMap[type] || 'general'
 
+    const supabase = createAdminClient()
     const { data, error } = await supabase.storage
       .from('uploads')
       .upload(`${folder}/${filename}`, compressed, {
@@ -32,11 +36,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('uploads')
-      .getPublicUrl(data.path)
-
-    return NextResponse.json({ url: publicUrl })
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    return NextResponse.json({ url: `${siteUrl}/api/files/${folder}/${filename}` })
   } catch (err: unknown) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Upload failed' }, { status: 500 })
   }
