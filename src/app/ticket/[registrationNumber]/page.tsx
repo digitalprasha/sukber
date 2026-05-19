@@ -39,7 +39,7 @@ export default async function TicketPage({ params }: Props) {
     <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <Image src="/logo.png" alt="SukaBernyanyi" width={80} height={80} className="mx-auto mb-2" />
+          <Image src="/logo.png" alt="SukaBernyanyi" width={100} height={100} className="mx-auto mb-2" />
           <h1 className="text-xl font-bold text-white">SukaBernyanyi</h1>
           <p className="text-gray-500 text-sm">Tiket Masuk</p>
         </div>

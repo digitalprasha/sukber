@@ -11,6 +11,18 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
+    const { data: existing } = await supabase
+      .from('participants')
+      .select('id, status')
+      .eq('event_id', event_id)
+      .or(`email.eq.${email},whatsapp.eq.${whatsapp}`)
+      .in('status', ['verified', 'checked_in'])
+      .maybeSingle()
+
+    if (existing) {
+      return NextResponse.json({ error: 'Email atau nomor WhatsApp sudah terdaftar dan telah disetujui untuk event ini. Jika ingin mendaftar ulang, hubungi admin.' }, { status: 409 })
+    }
+
     const { data: participant, error } = await supabase
       .from('participants')
       .insert({
