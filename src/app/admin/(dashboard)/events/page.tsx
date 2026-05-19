@@ -155,7 +155,7 @@ export default function AdminEventsPage() {
       ) : events.length === 0 ? (
         <div className="text-center py-20 text-gray-500">Belum ada event</div>
       ) : (
-        {openMenu && <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />}
+        <>{openMenu && <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />}
         <div className="grid gap-4">
           {events.map((event) => (
             <div key={event.id} className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/10">
@@ -199,7 +199,7 @@ export default function AdminEventsPage() {
             </div>
           ))}
         </div>
-      )}
+        </>)}
 
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
