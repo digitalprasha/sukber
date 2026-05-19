@@ -199,16 +199,16 @@ export default function NewEventPage() {
                 {payments.map((pm, i) => (
                   <div key={i} className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 mb-2">
                     <div className="shrink-0 mt-2">{pm.type === 'bank' ? <Banknote size={16} className="text-emerald-500" /> : <Wallet size={16} className="text-amber-500" />}</div>
-                    <div className="flex-1 grid grid-cols-3 gap-2">
+                    <div className="flex-1 flex flex-col sm:flex-row gap-2">
                       <select value={pm.type} onChange={e => updatePayment(i, { type: e.target.value as 'bank' | 'ewallet' })}
-                        className="appearance-none bg-[#1a1a2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 cursor-pointer">
+                        className="appearance-none bg-[#1a1a2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 cursor-pointer sm:w-[120px]">
                         <option value="bank" className="bg-[#1a1a2e]">BANK</option>
                         <option value="ewallet" className="bg-[#1a1a2e]">E-WALLET</option>
                       </select>
                       <input value={pm.name} onChange={e => updatePayment(i, { name: e.target.value })}
                         placeholder={pm.type === 'bank' ? 'BCA' : 'DANA'}
-                        className="px-3 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
-                      <div className="flex gap-1">
+                        className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
+                      <div className="flex gap-1 flex-1">
                         <input value={pm.number} onChange={e => updatePayment(i, { number: e.target.value })}
                           placeholder="No. rekening"
                           className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
