@@ -57,7 +57,7 @@ export default function AdminEventsPage() {
   async function handleToggleActive(item: any) {
     const { data: { user } } = await supabase.auth.getUser()
     const res = await fetch('/api/admin/events', {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'toggle_active', id: item.id, is_active: !item.is_active, user_email: user?.email }),
     })
