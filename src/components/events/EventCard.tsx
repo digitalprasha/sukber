@@ -16,7 +16,7 @@ export function EventCard({ event }: EventCardProps) {
           <img
             src={event.flyer_url}
             alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-contain transition-transform duration-500"
           />
         </div>
       ) : (
