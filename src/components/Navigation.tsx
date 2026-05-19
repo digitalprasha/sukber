@@ -102,8 +102,8 @@ export function Navigation() {
       </div>
 
       <div className={cn(
-        'md:hidden transition-all duration-400 ease-in-out',
-        isOpen ? 'max-h-[100vh] opacity-100' : 'max-h-0 opacity-0'
+        'md:hidden transition-all duration-400 ease-in-out overflow-hidden',
+        isOpen ? 'max-h-[100vh] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
       )}>
         <div className="px-4 pb-4 space-y-1">
           {links.map((link) => (
