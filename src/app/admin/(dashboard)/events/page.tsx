@@ -7,7 +7,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { Modal } from '@/components/ui/Modal'
 import { Toggle } from '@/components/ui/Toggle'
-import { Plus, Pencil, Trash2, RotateCcw, Search, Download, ShieldAlert } from 'lucide-react'
+import { Plus, Pencil, Trash2, RotateCcw, Search, Download, ShieldAlert, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
 const PER_PAGE = 10
@@ -23,6 +23,7 @@ export default function AdminEventsPage() {
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null)
   const [exportTarget, setExportTarget] = useState<any | null>(null)
   const [exportLoading, setExportLoading] = useState(false)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
   const loaded = useRef(false)
 
   useEffect(() => { loadEvents() }, [page, search])
@@ -154,31 +155,47 @@ export default function AdminEventsPage() {
       ) : events.length === 0 ? (
         <div className="text-center py-20 text-gray-500">Belum ada event</div>
       ) : (
+        {openMenu && <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />}
         <div className="grid gap-4">
           {events.map((event) => (
-            <div key={event.id} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+            <div key={event.id} className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/10">
               {event.flyer_url ? (
-                <img src={event.flyer_url} alt="" className="w-14 h-14 rounded-xl object-cover" />
+                <img src={event.flyer_url} alt="" className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl object-cover shrink-0" />
               ) : (
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center text-xl">🎤</div>
+                <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl bg-gradient-to-br from-emerald-900/50 to-amber-900/50 flex items-center justify-center text-base sm:text-xl shrink-0">🎤</div>
               )}
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-white truncate">{event.title}</h3>
-                <p className="text-sm text-gray-500">/{event.slug}</p>
+                <h3 className="font-medium text-white text-sm sm:text-base truncate">{event.title}</h3>
+                <p className="text-xs sm:text-sm text-gray-500 truncate">/{event.slug}</p>
               </div>
-              <Toggle checked={!!event.is_active} onChange={() => handleToggleActive(event)} />
-              <button onClick={() => handleExport(event)} className="p-2 rounded-lg hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-300 transition-colors" title="Unduh data peserta (CSV)">
-                <Download size={16} />
-              </button>
-              <button onClick={() => setDeleteTarget(event)} className="p-2 rounded-lg hover:bg-rose-500/10 text-gray-400 hover:text-rose-300 transition-colors" title="Hapus event">
-                <Trash2 size={16} />
-              </button>
-              <button onClick={() => setResetTarget(event)} className="p-2 rounded-lg hover:bg-amber-500/10 text-gray-400 hover:text-amber-300 transition-colors" title="Reset peserta & sponsor">
-                <RotateCcw size={16} />
-              </button>
-              <a href={`/admin/events/${event.id}/edit`} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
-                <Pencil size={18} />
-              </a>
+              <div className="relative shrink-0">
+                <button onClick={() => setOpenMenu(openMenu === event.id ? null : event.id)}
+                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+                  <MoreVertical size={18} />
+                </button>
+                {openMenu === event.id && (
+                  <div className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-white/10 bg-[#0f1a14] shadow-xl shadow-black/40 z-50 py-1.5">
+                    <div className="px-3 py-1.5 border-b border-white/5">
+                      <label className="flex items-center justify-between gap-3 text-xs text-gray-400">
+                        Aktif
+                        <Toggle checked={!!event.is_active} onChange={() => { handleToggleActive(event); setOpenMenu(null) }} />
+                      </label>
+                    </div>
+                    <button onClick={() => { handleExport(event); setOpenMenu(null) }} className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/5 transition-colors">
+                      <Download size={15} /> Unduh CSV
+                    </button>
+                    <a href={`/admin/events/${event.id}/edit`} onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                      <Pencil size={15} /> Edit
+                    </a>
+                    <button onClick={() => { setResetTarget(event); setOpenMenu(null) }} className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-gray-300 hover:text-amber-300 hover:bg-amber-500/5 transition-colors">
+                      <RotateCcw size={15} /> Reset
+                    </button>
+                    <button onClick={() => { setDeleteTarget(event); setOpenMenu(null) }} className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-gray-300 hover:text-rose-300 hover:bg-rose-500/5 transition-colors">
+                      <Trash2 size={15} /> Hapus
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
