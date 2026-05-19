@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
-import { Music2, CheckCircle } from 'lucide-react'
+import { CheckCircle } from 'lucide-react'
+import Image from 'next/image'
 import QRCode from 'qrcode'
 import type { Metadata } from 'next'
 
@@ -38,7 +39,7 @@ export default async function TicketPage({ params }: Props) {
     <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <Music2 className="text-emerald-400 mx-auto mb-2" size={32} />
+          <Image src="/logo.png" alt="SukaBernyanyi" width={48} height={48} className="mx-auto mb-2" />
           <h1 className="text-xl font-bold text-white">SukaBernyanyi</h1>
           <p className="text-gray-500 text-sm">Tiket Masuk</p>
         </div>
