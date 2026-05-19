@@ -92,9 +92,9 @@ export default function TicketsPage() {
     }
   }
 
-  async function handleRejectConfirm() {
+  async function handleSendMessage() {
     if (!rejectTarget || !rejectReason.trim()) {
-      toast.error('Harap isi alasan penolakan')
+      toast.error('Harap isi pesan')
       return
     }
     setRejectLoading(true)
@@ -103,23 +103,24 @@ export default function TicketsPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'reject_participant',
+        action: 'send_message',
         id: rejectTarget.id,
         name: rejectTarget.name,
+        message: rejectReason.trim(),
         user_email: user?.email,
       }),
     })
 
     if (!res.ok) {
       const result = await res.json()
-      toast.error(result.error || 'Gagal menolak')
+      toast.error(result.error || 'Gagal mengirim pesan')
       setRejectLoading(false)
     } else {
-      toast.success(`Peserta ${rejectTarget.name} ditolak`)
+      toast.success(`Pesan terkirim ke ${rejectTarget.name}`)
 
-      const waText = `Hi ${rejectTarget.name},\n\nPendaftaran Anda ditolak dengan alasan:\n${rejectReason}\n\nSilakan daftar ulang dengan data yang benar.\n\nTerima kasih.`
-      const emailSubject = 'Pendaftaran Ditolak - SukaBernyanyi'
-      const emailBody = `Hi ${rejectTarget.name},\n\nPendaftaran Anda ditolak dengan alasan:\n${rejectReason}\n\nSilakan daftar ulang dengan data yang benar.\n\nTerima kasih.`
+      const waText = `Hi ${rejectTarget.name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
+      const emailSubject = 'Pesan dari Admin - SukaBernyanyi'
+      const emailBody = `Hi ${rejectTarget.name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
 
       window.open(getWaUrl(rejectTarget.whatsapp, waText), '_blank')
       window.open(getMailtoUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
@@ -255,25 +256,25 @@ export default function TicketsPage() {
               <div className="mx-auto w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-3">
                 <AlertTriangle className="text-rose-400" size={24} />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-1">Tolak {rejectTarget.name}</h3>
-              <p className="text-sm text-gray-400">Bukti pembayaran akan dihapus. Peserta harus daftar ulang.</p>
+              <h3 className="text-lg font-semibold text-white mb-1">Kirim Pesan ke {rejectTarget.name}</h3>
+              <p className="text-sm text-gray-400">Pesan akan dikirim via WhatsApp & Email. Status peserta tetap pending.</p>
             </div>
-            <textarea
+              <textarea
               value={rejectReason}
               onChange={e => setRejectReason(e.target.value)}
-              placeholder="Tulis alasan penolakan..."
+              placeholder="Tulis pesan untuk peserta..."
               rows={4}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none text-sm mb-4"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none text-sm mb-4"
             />
-            <p className="text-xs text-gray-500 mb-4">Alasan akan dikirim via WhatsApp & Email ke peserta.</p>
+            <p className="text-xs text-gray-500 mb-4">Pesan akan dikirim via WhatsApp & Email ke peserta.</p>
             <div className="flex gap-3">
               <button onClick={() => { setRejectTarget(null); setRejectReason('') }} disabled={rejectLoading}
                 className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium disabled:opacity-50">
                 Batal
               </button>
-              <button onClick={handleRejectConfirm} disabled={rejectLoading || !rejectReason.trim()}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-medium hover:bg-rose-500 transition-all disabled:opacity-50">
-                {rejectLoading ? 'Memproses...' : 'Tolak & Kirim Pesan'}
+              <button onClick={handleSendMessage} disabled={rejectLoading || !rejectReason.trim()}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-all disabled:opacity-50">
+                {rejectLoading ? 'Mengirim...' : 'Kirim Pesan'}
               </button>
             </div>
           </div>

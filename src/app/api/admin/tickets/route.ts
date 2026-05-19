@@ -25,18 +25,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ registration_number: regNumber })
     }
 
-    if (action === 'reject_participant') {
+    if (action === 'send_message') {
       const { error } = await supabase.from('participants').update({
-        status: 'pending',
-        payment_proof_url: '',
+        admin_note: data.message,
       }).eq('id', data.id)
 
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
       await supabase.from('audit_logs').insert({
         user_email: data.user_email || 'unknown',
-        action: 'REJECT_PARTICIPANT',
-        details: `Menolak peserta ${data.name}`,
+        action: 'SEND_MESSAGE',
+        details: `Mengirim pesan ke ${data.name}: ${data.message}`,
       })
       return NextResponse.json({ success: true })
     }
