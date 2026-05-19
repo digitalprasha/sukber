@@ -96,12 +96,12 @@ export default function AdminEventsPage() {
       toast.error('Belum ada peserta'); return
     }
 
-    const header = 'Nama,Email,WhatsApp,No.Registrasi,Status,Check-In,Tanggal Daftar'
+    const header = 'Nama,Email,WhatsApp,No.Registrasi,Status,Check-In,Bukti Bayar,Tanggal Daftar'
     const rows = participants.map((p: any) =>
       [
         `"${p.name}"`, `"${p.email}"`, p.whatsapp,
         p.registration_number || '', p.status === 'verified' ? 'Terverifikasi' : p.status === 'checked_in' ? 'Check-in' : 'Pending',
-        p.is_checked_in ? 'Ya' : 'Tidak',
+        p.is_checked_in ? 'Ya' : 'Tidak', p.payment_proof_url || '',
         new Date(p.created_at).toLocaleDateString('id-ID'),
       ].join(',')
     ).join('\n')

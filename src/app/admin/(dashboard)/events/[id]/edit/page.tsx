@@ -37,6 +37,7 @@ export default function EditEventPage() {
   const [deadline, setDeadline] = useState('')
   const [regOpen, setRegOpen] = useState(true)
   const [payments, setPayments] = useState<PaymentMethod[]>([])
+  const [payConfirmed, setPayConfirmed] = useState(false)
   const [flyer, setFlyer] = useState<File | null>(null)
   const [flyerPreview, setFlyerPreview] = useState('')
   const [existingFlyer, setExistingFlyer] = useState('')
@@ -81,6 +82,10 @@ export default function EditEventPage() {
 
     if (payments.some(p => !p.name || !p.number)) {
       toast.error('Lengkapi nama dan nomor semua metode pembayaran')
+      setLoading(false); return
+    }
+    if (payments.length > 0 && !payConfirmed) {
+      toast.error('Harap centang konfirmasi nomor pembayaran sebelum menyimpan')
       setLoading(false); return
     }
 
@@ -222,7 +227,17 @@ export default function EditEventPage() {
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-600 mb-3">Daftar bank/e-wallet yang bisa digunakan peserta untuk transfer</p>
+                <div className="p-2 rounded-lg bg-amber-500/5 border border-amber-500/20 mb-3">
+                  <p className="text-[11px] text-amber-300/70">⚠️ Pastikan nomor rekening/e-wallet sudah benar. Kesalahan nomor bisa menyebabkan kerugian.</p>
+                </div>
                 {payments.length === 0 && <p className="text-xs text-gray-600 italic">Belum ada metode pembayaran. Klik "Tambah" untuk menambahkan.</p>}
+                {payments.length > 0 && (
+                  <label className="flex items-start gap-2 mb-3 cursor-pointer">
+                    <input type="checkbox" checked={payConfirmed} onChange={e => setPayConfirmed(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 accent-emerald-500" />
+                    <span className="text-xs text-gray-500 leading-relaxed">Saya telah memeriksa dan memastikan nomor rekening/e-wallet di atas sudah benar</span>
+                  </label>
+                )}
                 {payments.map((pm, i) => (
                   <div key={i} className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 mb-2">
                     <div className="shrink-0 mt-2">{pm.type === 'bank' ? <Banknote size={16} className="text-emerald-500" /> : <Wallet size={16} className="text-amber-500" />}</div>
