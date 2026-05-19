@@ -31,41 +31,52 @@ export default function AdminNewsPage() {
 
   async function loadNews() {
     setLoading(true)
-    let query = supabase.from('news').select('*', { count: 'exact' })
-    if (search) {
-      query = query.ilike('title', `%${search}%`)
+    try {
+      const params = new URLSearchParams({ page: String(page) })
+      if (search) params.set('search', search)
+      const res = await fetch(`/api/admin/news?${params}`)
+      if (!res.ok) throw new Error('Gagal memuat berita')
+      const result = await res.json()
+      setNews(result.data || [])
+      setTotal(result.total || 0)
+    } catch {
+      toast.error('Gagal memuat berita')
+    } finally {
+      setLoading(false)
     }
-    const { data, count } = await query
-      .order('created_at', { ascending: false })
-      .range((page - 1) * PER_PAGE, page * PER_PAGE - 1)
-    setNews(data || [])
-    setTotal(count || 0)
-    setLoading(false)
   }
 
   useEffect(() => { loadNews() }, [page, search])
 
   async function handleToggleActive(item: any) {
-    const { error } = await supabase.from('news').update({ is_active: !item.is_active }).eq('id', item.id)
-    if (error) { toast.error(error.message); return }
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/news', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: item.id, title: item.title, slug: item.slug,
+        content: item.content, tags: item.tags || [],
+        is_active: !item.is_active, thumbnail_url: item.thumbnail_url,
+        user_email: user?.email,
+      }),
+    })
+    if (!res.ok) { toast.error('Gagal mengubah status'); return }
     toast.success(item.is_active ? 'Berita dinonaktifkan' : 'Berita diaktifkan')
     loadNews()
   }
 
   async function handleDelete() {
     if (!deleteTarget) return
-    const { error } = await supabase.from('news').delete().eq('id', deleteTarget.id)
-    if (error) {
-      toast.error(error.message)
-    } else {
-      await supabase.from('audit_logs').insert({
-        action: 'DELETE_NEWS',
-        details: `Menghapus berita: ${deleteTarget.title}`,
-      })
-      toast.success('Berita berhasil dihapus')
-      setDeleteTarget(null)
-      loadNews()
-    }
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await fetch('/api/admin/news', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: deleteTarget.id, user_email: user?.email }),
+    })
+    if (!res.ok) { toast.error('Gagal menghapus'); return }
+    toast.success('Berita berhasil dihapus')
+    setDeleteTarget(null)
+    loadNews()
   }
 
   const totalPages = Math.ceil(total / PER_PAGE)
