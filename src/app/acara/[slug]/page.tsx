@@ -5,7 +5,14 @@ import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
 import { ShareButton } from '@/components/ui/ShareButton'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { Banknote, Wallet, Building2 } from 'lucide-react'
 import type { Metadata } from 'next'
+
+interface PaymentMethod {
+  type: 'bank' | 'ewallet'
+  name: string
+  number: string
+}
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -38,6 +45,8 @@ export default async function EventDetailPage({ params }: Props) {
     .single()
 
   if (!event) notFound()
+
+  const paymentMethods: PaymentMethod[] = Array.isArray(event.payment_methods) ? event.payment_methods : []
 
   const { data: sponsors } = await supabase
     .from('sponsors')
@@ -95,10 +104,27 @@ export default async function EventDetailPage({ params }: Props) {
                 <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
                   <h2 className="text-xl font-semibold text-white mb-6">Pendaftaran</h2>
 
-                  {event.payment_info && (
-                    <div className="mb-6 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                      <h3 className="text-sm font-medium text-emerald-300 mb-2">Informasi Pembayaran</h3>
-                      <p className="text-sm text-gray-300 whitespace-pre-wrap">{event.payment_info}</p>
+                  {paymentMethods.length > 0 && (
+                    <div className="mb-6 rounded-xl bg-emerald-500/5 border border-emerald-500/20 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-emerald-500/10">
+                        <h3 className="text-sm font-medium text-emerald-300">Metode Pembayaran</h3>
+                      </div>
+                      <div className="divide-y divide-emerald-500/10">
+                        {paymentMethods.map((pm, i) => (
+                          <div key={i} className="flex items-center gap-3 px-4 py-3">
+                            {pm.type === 'bank' ? (
+                              <Building2 size={18} className="text-emerald-400 shrink-0" />
+                            ) : (
+                              <Wallet size={18} className="text-amber-400 shrink-0" />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">{pm.type === 'bank' ? 'BANK' : 'E-WALLET'}</p>
+                              <p className="text-sm font-medium text-white">{pm.name}</p>
+                            </div>
+                            <p className="text-sm font-semibold text-emerald-200 tabular-nums">{pm.number}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 

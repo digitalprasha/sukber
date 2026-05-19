@@ -69,12 +69,15 @@ export default function NewNewsPage() {
         />
         <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
         <Input label="Tags (pisahkan dengan koma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="musik, konser, komunitas" />
+        <p className="text-[11px] text-gray-600 -mt-4">Contoh: musik, konser, komunitas. Dipisah dengan koma.</p>
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-300">Konten</label>
+          <p className="text-[11px] text-gray-600 mb-1">Isi berita. Bisa menggunakan teks, gambar, dan format lainnya.</p>
           <RichTextEditor content={form.content} onChange={(html) => setForm({ ...form, content: html })} placeholder="Tulis berita di sini..." />
         </div>
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-300">Thumbnail</label>
+          <p className="text-[11px] text-gray-600 mb-1">Gambar sampul untuk berita. Ukuran maksimal 500KB.</p>
           <input type="file" accept="image/*" onChange={(e) => {
             const file = e.target.files?.[0]
             if (file) { setThumbnail(file); setThumbPreview(URL.createObjectURL(file)) }

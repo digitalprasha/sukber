@@ -27,10 +27,10 @@ CREATE TABLE event_management.events (
   description TEXT NOT NULL DEFAULT '',
   is_active BOOLEAN DEFAULT true,
   registration_enabled BOOLEAN DEFAULT true,
-  registration_fee NUMERIC(10,2) DEFAULT 0,
+  registration_fee NUMERIC(12,0) DEFAULT 0,
   max_participants INTEGER,
   registration_deadline TIMESTAMPTZ,
-  payment_info TEXT DEFAULT '',
+  payment_methods JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

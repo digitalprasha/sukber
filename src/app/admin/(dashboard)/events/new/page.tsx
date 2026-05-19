@@ -9,7 +9,7 @@ import { Toggle } from '@/components/ui/Toggle'
 import { RichTextEditor } from '@/components/editor/RichTextEditor'
 import { slugify } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, HelpCircle, Banknote, Wallet } from 'lucide-react'
 
 interface SponsorField {
   name: string
@@ -17,29 +17,33 @@ interface SponsorField {
   preview: string
 }
 
+interface PaymentMethod {
+  type: 'bank' | 'ewallet'
+  name: string
+  number: string
+}
+
 export default function NewEventPage() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: 'SBS', description: '' })
-  const [registration, setRegistration] = useState({
-    enabled: true, fee: 0, max_participants: '', deadline: '', payment_info: '',
-  })
+  const [fee, setFee] = useState('')
+  const [maxPax, setMaxPax] = useState('')
+  const [deadline, setDeadline] = useState('')
+  const [regOpen, setRegOpen] = useState(true)
+  const [payments, setPayments] = useState<PaymentMethod[]>([])
   const [flyer, setFlyer] = useState<File | null>(null)
   const [flyerPreview, setFlyerPreview] = useState('')
   const [sponsors, setSponsors] = useState<SponsorField[]>([])
 
-  const addSponsor = () => {
-    setSponsors([...sponsors, { name: '', logo: null, preview: '' }])
-  }
+  const addPayment = () => setPayments([...payments, { type: 'bank', name: '', number: '' }])
+  const updatePayment = (i: number, field: Partial<PaymentMethod>) => setPayments(payments.map((p, j) => j === i ? { ...p, ...field } : p))
+  const removePayment = (i: number) => setPayments(payments.filter((_, j) => j !== i))
 
-  const removeSponsor = (idx: number) => {
-    setSponsors(sponsors.filter((_, i) => i !== idx))
-  }
-
-  const updateSponsor = (idx: number, field: Partial<SponsorField>) => {
-    setSponsors(sponsors.map((s, i) => i === idx ? { ...s, ...field } : s))
-  }
+  const addSponsor = () => setSponsors([...sponsors, { name: '', logo: null, preview: '' }])
+  const removeSponsor = (i: number) => setSponsors(sponsors.filter((_, j) => j !== i))
+  const updateSponsor = (i: number, field: Partial<SponsorField>) => setSponsors(sponsors.map((s, j) => j === i ? { ...s, ...field } : s))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,20 +51,17 @@ export default function NewEventPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      const user_email = user?.email || 'unknown'
+      if (payments.some(p => !p.name || !p.number)) {
+        toast.error('Lengkapi nama dan nomor semua metode pembayaran')
+        setLoading(false); return
+      }
 
       let flyer_url = ''
       if (flyer) {
-        const fd = new FormData()
-        fd.append('file', flyer)
-        fd.append('type', 'flyer')
+        const fd = new FormData(); fd.append('file', flyer); fd.append('type', 'flyer')
         const res = await fetch('/api/upload', { method: 'POST', body: fd })
-        if (!res.ok) {
-          const err = await res.json()
-          throw new Error(err.error || 'Gagal upload flyer')
-        }
-        const data = await res.json()
-        flyer_url = data.url
+        if (!res.ok) throw new Error((await res.json()).error || 'Gagal upload flyer')
+        flyer_url = (await res.json()).url
       }
 
       const res = await fetch('/api/admin/events', {
@@ -68,144 +69,173 @@ export default function NewEventPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'create_event',
-          title: form.title,
-          slug: form.slug,
-          ticket_prefix: form.ticket_prefix,
-          description: form.description,
-          flyer_url,
-          registration_enabled: registration.enabled,
-          registration_fee: registration.fee,
-          max_participants: registration.max_participants ? Number(registration.max_participants) : null,
-          registration_deadline: registration.deadline || null,
-          payment_info: registration.payment_info,
-          user_email,
+          title: form.title, slug: form.slug, ticket_prefix: form.ticket_prefix,
+          description: form.description, flyer_url, user_email: user?.email,
+          registration_enabled: regOpen,
+          registration_fee: fee ? Number(fee) : 0,
+          max_participants: maxPax ? Number(maxPax) : null,
+          registration_deadline: deadline || null,
+          payment_methods: payments,
         }),
       })
+      if (!res.ok) throw new Error((await res.json()).error || 'Gagal membuat event')
       const result = await res.json()
-      if (!res.ok) throw new Error(result.error || 'Gagal membuat event')
 
       for (const sp of sponsors) {
         if (!sp.logo) continue
-        const fd = new FormData()
-        fd.append('file', sp.logo)
-        fd.append('type', 'sponsor')
+        const fd = new FormData(); fd.append('file', sp.logo); fd.append('type', 'sponsor')
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd })
         if (!uploadRes.ok) throw new Error('Gagal upload logo sponsor')
         const { url } = await uploadRes.json()
-
         const spRes = await fetch('/api/admin/events', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'add_sponsor', event_id: result.id, name: sp.name, logo_url: url }),
         })
-        if (!spRes.ok) {
-          const spErr = await spRes.json()
-          throw new Error(spErr.error || 'Gagal menyimpan sponsor')
-        }
+        if (!spRes.ok) throw new Error('Gagal menyimpan sponsor')
       }
 
       toast.success('Event berhasil dibuat')
       router.push('/admin/events')
-      router.refresh()
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
-      toast.error(msg)
+      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-white mb-8">Tambah Event Baru</h1>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <Input label="Judul Event" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value, slug: slugify(e.target.value) })} required />
-        <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
-        <Input label="Prefix Tiket" value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })} required />
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-300">Deskripsi</label>
-          <RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} placeholder="Tulis deskripsi event..." />
-        </div>
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-300">Flyer / Poster</label>
-          <input type="file" accept="image/*" onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) { setFlyer(file); setFlyerPreview(URL.createObjectURL(file)) }
-          }} className="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
-          {flyerPreview && (
-            <img src={flyerPreview} alt="Preview flyer" className="mt-2 h-40 w-auto rounded-xl object-cover border border-white/10" />
-          )}
-        </div>
+    <div className="max-w-3xl">
+      <div className="flex items-center gap-2 mb-6">
+        <h1 className="text-2xl font-bold text-white">Tambah Event Baru</h1>
+      </div>
 
-        <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-4">
-          <h3 className="text-sm font-semibold text-white">Pengaturan Pendaftaran</h3>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-300">Buka Pendaftaran</span>
-            <Toggle checked={registration.enabled} onChange={(v) => setRegistration({ ...registration, enabled: v })} />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-3">
+          <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Informasi Event</h3>
+          <Input label="Judul Event" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value, slug: slugify(e.target.value) })} required />
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
+            <Input label="Prefix Tiket" value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })} required />
           </div>
-          {registration.enabled && (
-            <div className="space-y-4 pt-2">
-              <Input label="Biaya Pendaftaran (Rp)" type="number" min={0} value={registration.fee} onChange={(e) => setRegistration({ ...registration, fee: Number(e.target.value) })} />
-              <Input label="Maksimal Peserta (opsional)" type="number" min={1} value={registration.max_participants} onChange={(e) => setRegistration({ ...registration, max_participants: e.target.value })} />
-              <Input label="Batas Waktu Pendaftaran (opsional)" type="datetime-local" value={registration.deadline} onChange={(e) => setRegistration({ ...registration, deadline: e.target.value })} />
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-300">Informasi Pembayaran</label>
-                <p className="text-[11px] text-gray-500">Masukkan nomor rekening bank atau e-wallet untuk pembayaran</p>
-                <textarea value={registration.payment_info} onChange={(e) => setRegistration({ ...registration, payment_info: e.target.value })}
-                  rows={4} placeholder="BCA: 1234567890 a.n. SukaBernyanyi&#10;DANA: 081234567890"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 resize-y text-sm" />
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Deskripsi</label>
+            <RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} placeholder="Tulis deskripsi event..." />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Flyer / Poster</label>
+            <p className="text-[11px] text-gray-600 mb-2">Upload gambar flyer atau poster event</p>
+            <input type="file" accept="image/*" onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) { setFlyer(file); setFlyerPreview(URL.createObjectURL(file)) }
+            }} className="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
+            {flyerPreview && <img src={flyerPreview} alt="" className="mt-2 h-28 w-auto rounded-xl object-cover border border-white/10" />}
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Pendaftaran</h3>
+            <Toggle checked={regOpen} onChange={setRegOpen} />
+          </div>
+          <p className="text-[11px] text-gray-600 -mt-2">Nonaktifkan untuk menutup pendaftaran event ini</p>
+
+          {regOpen && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Biaya Pendaftaran (Rp)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+                    <input type="text" inputMode="numeric" value={fee} onChange={e => setFee(e.target.value.replace(/\D/g, ''))}
+                      placeholder="0"
+                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
+                  </div>
+                  <p className="text-[11px] text-gray-600 mt-1">Kosongkan atau isi 0 = Gratis</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Maksimal Peserta</label>
+                  <input type="text" inputMode="numeric" value={maxPax} onChange={e => setMaxPax(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Tidak terbatas"
+                    className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
+                  <p className="text-[11px] text-gray-600 mt-1">Kosongkan jika tidak ada batas</p>
+                </div>
               </div>
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Batas Waktu Pendaftaran</label>
+                <input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/20 text-white focus:outline-none focus:border-emerald-500/50 text-sm [color-scheme:dark]" />
+                <p className="text-[11px] text-gray-600 mt-1">Kosongkan jika tidak ada batas waktu</p>
+              </div>
+
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-gray-300">Metode Pembayaran</label>
+                  <button type="button" onClick={addPayment} className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+                    <Plus size={12} /> Tambah
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-600 mb-3">Daftar bank/e-wallet yang bisa digunakan peserta untuk transfer</p>
+                {payments.length === 0 && <p className="text-xs text-gray-600 italic">Belum ada metode pembayaran. Klik "Tambah" untuk menambahkan.</p>}
+                {payments.map((pm, i) => (
+                  <div key={i} className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 mb-2">
+                    <div className="shrink-0 mt-2">{pm.type === 'bank' ? <Banknote size={16} className="text-emerald-500" /> : <Wallet size={16} className="text-amber-500" />}</div>
+                    <div className="flex-1 grid grid-cols-3 gap-2">
+                      <select value={pm.type} onChange={e => updatePayment(i, { type: e.target.value as 'bank' | 'ewallet' })}
+                        className="appearance-none bg-[#1a1a2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 cursor-pointer">
+                        <option value="bank" className="bg-[#1a1a2e]">BANK</option>
+                        <option value="ewallet" className="bg-[#1a1a2e]">E-WALLET</option>
+                      </select>
+                      <input value={pm.name} onChange={e => updatePayment(i, { name: e.target.value })}
+                        placeholder={pm.type === 'bank' ? 'BCA' : 'DANA'}
+                        className="px-3 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
+                      <div className="flex gap-1">
+                        <input value={pm.number} onChange={e => updatePayment(i, { number: e.target.value })}
+                          placeholder="No. rekening"
+                          className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" />
+                        <button type="button" onClick={() => removePayment(i)} className="p-2 rounded-lg hover:bg-rose-500/10 text-gray-500 hover:text-rose-300 transition-colors shrink-0">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
-        <div className="space-y-3">
+        <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-300">Sponsor</label>
-            <button type="button" onClick={addSponsor} className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
-              <Plus size={14} />
-              Tambah Sponsor
+            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Sponsor</h3>
+            <button type="button" onClick={addSponsor} className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+              <Plus size={12} /> Tambah Sponsor
             </button>
           </div>
-          {sponsors.length === 0 && (
-            <p className="text-xs text-gray-600">Belum ada sponsor. Klik &ldquo;Tambah Sponsor&rdquo; untuk menambahkan.</p>
-          )}
-          {sponsors.map((sp, idx) => (
-            <div key={idx} className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex-1 space-y-3">
+          <p className="text-[11px] text-gray-600 -mt-2">Logo sponsor akan tampil di halaman publik, nama hanya terlihat admin</p>
+          {sponsors.length === 0 && <p className="text-xs text-gray-600 italic">Belum ada sponsor</p>}
+          {sponsors.map((sp, i) => (
+            <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/10">
+              <div className="flex-1 space-y-2">
                 <div>
-                  <label className="block text-[11px] text-gray-500 mb-1">Logo</label>
-                  <input type="file" accept="image/*" onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) {
-                      updateSponsor(idx, { logo: file, preview: URL.createObjectURL(file) })
-                    }
-                  }} className="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300 hover:file:bg-emerald-500/20" />
-                  {sp.preview && (
-                    <img src={sp.preview} alt="Preview logo sponsor" className="mt-2 h-10 w-auto rounded-lg border border-white/10" />
-                  )}
+                  <label className="text-[11px] text-gray-500 mb-1 block">Logo</label>
+                  <input type="file" accept="image/*" onChange={e => {
+                    const f = e.target.files?.[0]; if (f) updateSponsor(i, { logo: f, preview: URL.createObjectURL(f) })
+                  }} className="w-full text-xs text-gray-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-500/10 file:text-emerald-300" />
+                  {sp.preview && <img src={sp.preview} alt="" className="mt-1 h-8 w-auto rounded-lg border border-white/10" />}
                 </div>
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-gray-300">
-                    Nama Sponsor{' '}
-                    <em className="text-rose-400 text-[11px] not-italic">*hanya terlihat oleh admin</em>
-                  </label>
-                  <input
-                    value={sp.name}
-                    onChange={(e) => updateSponsor(idx, { name: e.target.value })}
-                    placeholder="Nama sponsor"
-                    className="w-full px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
-                  />
-                </div>
+                <input value={sp.name} onChange={e => updateSponsor(i, { name: e.target.value })}
+                  placeholder="Nama sponsor"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
               </div>
-              <button type="button" onClick={() => removeSponsor(idx)} className="p-1.5 rounded-lg hover:bg-rose-500/10 text-gray-500 hover:text-rose-300 transition-colors mt-6">
-                <X size={16} />
+              <button type="button" onClick={() => removeSponsor(i)} className="p-1.5 rounded-lg hover:bg-rose-500/10 text-gray-500 hover:text-rose-300 transition-colors mt-4">
+                <X size={14} />
               </button>
             </div>
           ))}
         </div>
 
-        <div className="flex gap-4 pt-4">
+        <div className="flex gap-4 pt-2">
           <Button type="submit" loading={loading}>Simpan</Button>
           <Button type="button" variant="ghost" onClick={() => router.back()}>Batal</Button>
         </div>

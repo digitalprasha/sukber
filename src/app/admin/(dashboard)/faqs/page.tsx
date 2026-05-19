@@ -81,16 +81,19 @@ export default function AdminFaqsPage() {
             <label className="block text-sm text-gray-400 mb-1.5">Pertanyaan</label>
             <input value={form.question} onChange={e => setForm({ ...form, question: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50" required />
+            <p className="text-[11px] text-gray-600 mt-1">Pertanyaan yang sering diajukan, akan tampil di halaman utama</p>
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1.5">Jawaban</label>
             <textarea value={form.answer} onChange={e => setForm({ ...form, answer: e.target.value })} rows={4}
               className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 resize-y" required />
+            <p className="text-[11px] text-gray-600 mt-1">Jawaban lengkap untuk pertanyaan di atas</p>
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1.5">Urutan</label>
             <input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })}
               className="w-24 px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white focus:outline-none focus:border-emerald-500/50" />
+            <p className="text-[11px] text-gray-600 mt-1">Semakin kecil angka, semakin atas posisinya</p>
           </div>
           <div className="flex gap-3 pt-2">
             <Button type="submit" loading={saving}>Simpan</Button>

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         registration_fee: data.registration_fee ?? 0,
         max_participants: data.max_participants || null,
         registration_deadline: data.registration_deadline || null,
-        payment_info: data.payment_info || '',
+        payment_methods: data.payment_methods || [],
       }
       const { data: event, error } = await supabase
         .from('events')

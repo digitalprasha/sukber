@@ -107,12 +107,17 @@ export default function AdminGalleryPage() {
               <Video size={16} className="inline mr-1" /> YouTube
             </button>
           </div>
+          <p className="text-[11px] text-gray-600 -mt-2">Pilih jenis media yang akan ditambahkan ke galeri</p>
           {form.type === 'image' ? (
             <Input label="Upload Gambar" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
           ) : (
-            <Input label="URL YouTube" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
+            <>
+              <Input label="URL YouTube" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
+              <p className="text-[11px] text-gray-600 -mt-2">Tempel link video YouTube yang ingin ditampilkan</p>
+            </>
           )}
           <Input label="Keterangan" value={form.caption} onChange={(e) => setForm({ ...form, caption: e.target.value })} />
+          <p className="text-[11px] text-gray-600 -mt-2">Deskripsi singkat untuk galeri</p>
           <div className="flex gap-3">
             <Button type="submit">Simpan</Button>
             <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Batal</Button>

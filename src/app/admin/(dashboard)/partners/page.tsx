@@ -103,6 +103,7 @@ export default function AdminPartnersPage() {
               <label className="block text-sm text-gray-400 mb-1.5">Nama</label>
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50" required />
+              <p className="text-[11px] text-gray-600 mt-1">Nama perusahaan/individu partner</p>
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1.5">Kategori</label>
@@ -115,6 +116,7 @@ export default function AdminPartnersPage() {
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </div>
               </div>
+              <p className="text-[11px] text-gray-600 mt-1">Partnership = mitra biasa, Sponsorship = penyandang dana, Collaborator = kolaborator, Media Partner = partner media</p>
             </div>
           </div>
           <div>
@@ -127,11 +129,13 @@ export default function AdminPartnersPage() {
             <label className="block text-sm text-gray-400 mb-1.5">URL Website</label>
             <input value={form.website_url} onChange={e => setForm({ ...form, website_url: e.target.value })} placeholder="https://..."
               className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50" />
+            <p className="text-[11px] text-gray-600 mt-1">Opsional. Website partner bisa diklik oleh pengunjung</p>
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1.5">Urutan</label>
             <input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })}
               className="w-24 px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 text-white focus:outline-none focus:border-emerald-500/50" />
+            <p className="text-[11px] text-gray-600 mt-1">Semakin kecil angka, semakin tampil di depan</p>
           </div>
           <div className="flex gap-3 pt-2">
             <Button type="submit" loading={saving}>Simpan</Button>
