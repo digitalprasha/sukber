@@ -138,10 +138,10 @@ export default function TicketsPage() {
             className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
         <select value={selectedEvent} onChange={(e) => { setSelectedEvent(e.target.value); setPage(1) }}
-          className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-          <option value="all">Semua Event</option>
+          className="appearance-none w-full sm:w-auto px-4 py-2.5 bg-[#1a1a2e] border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+          <option value="all" className="bg-[#1a1a2e] text-white">Semua Event</option>
           {events.map((ev) => (
-            <option key={ev.id} value={ev.id}>{ev.title}</option>
+            <option key={ev.id} value={ev.id} className="bg-[#1a1a2e] text-white">{ev.title}</option>
           ))}
         </select>
       </div>
