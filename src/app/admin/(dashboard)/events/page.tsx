@@ -5,8 +5,9 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { Modal } from '@/components/ui/Modal'
 import { Toggle } from '@/components/ui/Toggle'
-import { Plus, Pencil, Trash2, RotateCcw, Search, Download } from 'lucide-react'
+import { Plus, Pencil, Trash2, RotateCcw, Search, Download, ShieldAlert } from 'lucide-react'
 import { toast } from 'sonner'
 
 const PER_PAGE = 10
@@ -20,6 +21,8 @@ export default function AdminEventsPage() {
   const [search, setSearch] = useState('')
   const [resetTarget, setResetTarget] = useState<any | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null)
+  const [exportTarget, setExportTarget] = useState<any | null>(null)
+  const [exportLoading, setExportLoading] = useState(false)
   const loaded = useRef(false)
 
   useEffect(() => { loadEvents() }, [page, search])
@@ -84,23 +87,23 @@ export default function AdminEventsPage() {
     }
   }
 
-  async function handleExport(event: any) {
-    const confirmed = window.confirm(
-      '⚠️ DATA RAHASIA — File ini berisi data pribadi peserta (nama, email, WhatsApp) dan link bukti pembayaran.\n\n'
-      + 'Hanya untuk kebutuhan internal organisasi. DILARANG menyebarluaskan file ini ke pihak lain.\n\n'
-      + 'Lanjutkan download?'
-    )
-    if (!confirmed) return
+  function handleExport(event: any) {
+    setExportTarget(event)
+  }
+
+  async function confirmExport() {
+    if (!exportTarget) return
+    setExportLoading(true)
 
     const res = await fetch('/api/admin/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'export_participants', id: event.id }),
+      body: JSON.stringify({ action: 'export_participants', id: exportTarget.id }),
     })
-    if (!res.ok) { toast.error('Gagal mengambil data'); return }
+    if (!res.ok) { toast.error('Gagal mengambil data'); setExportLoading(false); return }
     const { participants } = await res.json()
     if (!participants || participants.length === 0) {
-      toast.error('Belum ada peserta'); return
+      toast.error('Belum ada peserta'); setExportLoading(false); return
     }
 
     const warning = '# FILE INI BERSIFAT RAHASIA — Hanya untuk kebutuhan internal organisasi.\n'
@@ -119,8 +122,11 @@ export default function AdminEventsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `peserta_${event.slug}_${new Date().toISOString().slice(0,10)}.csv`
+    a.download = `peserta_${exportTarget.slug}_${new Date().toISOString().slice(0,10)}.csv`
     a.click()
+
+    setExportLoading(false)
+    setExportTarget(null)
     URL.revokeObjectURL(url)
     toast.success(`Berhasil mengunduh ${participants.length} peserta`)
   }
@@ -201,6 +207,33 @@ export default function AdminEventsPage() {
         requireCheckbox
         checkboxLabel="Saya telah membackup data dan memahami bahwa tindakan ini tidak dapat dibatalkan."
       />
+
+      <Modal open={!!exportTarget} onClose={() => !exportLoading && setExportTarget(null)} title="">
+        <div className="text-center">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-rose-500/20 flex items-center justify-center mb-4 ring-1 ring-amber-500/20">
+            <ShieldAlert className="text-amber-400" size={28} />
+          </div>
+          <h3 className="text-lg font-semibold text-white mb-3">⚠️ Data Rahasia</h3>
+          <div className="bg-rose-500/5 border border-rose-500/10 rounded-xl px-4 py-3 mb-4 text-left">
+            <p className="text-sm text-gray-300 leading-relaxed">
+              File ini berisi <span className="text-rose-300 font-medium">data pribadi peserta</span> (nama, email, WhatsApp) dan link bukti pembayaran.
+            </p>
+          </div>
+          <p className="text-sm text-amber-300/80 font-medium mb-6">
+            Hanya untuk kebutuhan internal organisasi. <span className="text-rose-400">DILARANG menyebarluaskan</span> ke pihak lain.
+          </p>
+          <div className="flex gap-3">
+            <button onClick={() => setExportTarget(null)} disabled={exportLoading}
+              className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium disabled:opacity-50">
+              Batal
+            </button>
+            <button onClick={confirmExport} disabled={exportLoading}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 text-white text-sm font-medium hover:from-amber-500 hover:to-rose-500 transition-all disabled:opacity-50">
+              {exportLoading ? 'Mengunduh...' : 'Lanjutkan Download'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
