@@ -7,7 +7,7 @@ export async function GallerySection() {
     .from('gallery')
     .select('*')
     .order('created_at', { ascending: false })
-    .limit(4)
+    .limit(6)
 
   const empty = !items || items.length === 0
 
