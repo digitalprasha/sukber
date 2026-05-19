@@ -137,9 +137,14 @@ export function RegistrationForm({ eventId, fee, maxParticipants, deadline }: Re
       <Input
         label="Nomor WhatsApp"
         id="whatsapp"
-        placeholder="6281234567890"
+        placeholder="081234567890"
         value={form.whatsapp}
         onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+        onBlur={(e) => {
+          const v = e.target.value.replace(/\s/g, '')
+          if (v.startsWith('0')) setForm({ ...form, whatsapp: `+62${v.slice(1)}` })
+          else if (v.startsWith('62') && !v.startsWith('+62')) setForm({ ...form, whatsapp: `+${v}` })
+        }}
         required
       />
 
