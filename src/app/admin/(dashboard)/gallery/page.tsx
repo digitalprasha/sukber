@@ -22,6 +22,7 @@ export default function AdminGalleryPage() {
   const [form, setForm] = useState({ type: 'image', url: '', caption: '' })
   const [file, setFile] = useState<File | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null)
+  const [uploading, setUploading] = useState(false)
   const loaded = useRef(false)
 
   useEffect(() => {
@@ -51,12 +52,14 @@ export default function AdminGalleryPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setUploading(true)
     let url = form.url
     if (file && form.type === 'image') {
       const fd = new FormData()
       fd.append('file', file)
       fd.append('type', 'gallery')
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      if (!res.ok) { toast.error('Gagal upload gambar'); setUploading(false); return }
       const data = await res.json()
       url = data.url
     }
@@ -66,6 +69,7 @@ export default function AdminGalleryPage() {
       details: `Menambah galeri: ${form.caption}`,
     })
     toast.success('Galeri berhasil ditambahkan')
+    setUploading(false)
     setShowForm(false)
     setForm({ type: 'image', url: '', caption: '' })
     setFile(null)
@@ -119,7 +123,7 @@ export default function AdminGalleryPage() {
           <Input label="Keterangan" value={form.caption} onChange={(e) => setForm({ ...form, caption: e.target.value })} />
           <p className="text-[11px] text-gray-600 -mt-2">Deskripsi singkat untuk galeri</p>
           <div className="flex gap-3">
-            <Button type="submit">Simpan</Button>
+            <Button type="submit" loading={uploading}>Simpan</Button>
             <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Batal</Button>
           </div>
         </form>

@@ -131,7 +131,7 @@ export default function NewEventPage() {
               <input value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })}
                 placeholder="VOL8"
                 className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" required />
-              <p className="text-[11px] text-gray-600 mt-1">Cukup isi kode event saja (contoh: <span className="text-emerald-400">VOL8</span>). Hasil akhir: <span className="text-emerald-400">SBS-VOL8-001</span>. <span className="text-gray-500">SBS</span> dan nomor urut ditambahkan otomatis.</p>
+              <p className="text-[11px] text-gray-600 mt-1">Tentukan prefix tiket. Contoh: <span className="text-emerald-400">SBS-VOL8</span> → hasil: <span className="text-emerald-400">SBS-VOL8-001</span>. Nomor urut ditambahkan otomatis.</p>
             </div>
           </div>
           <div>
