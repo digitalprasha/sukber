@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { Toggle } from '@/components/ui/Toggle'
-import { Plus, Pencil, Trash2, RotateCcw, Search } from 'lucide-react'
+import { Plus, Pencil, Trash2, RotateCcw, Search, Download } from 'lucide-react'
 import { toast } from 'sonner'
 
 const PER_PAGE = 10
@@ -84,6 +84,38 @@ export default function AdminEventsPage() {
     }
   }
 
+  async function handleExport(event: any) {
+    const res = await fetch('/api/admin/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'export_participants', id: event.id }),
+    })
+    if (!res.ok) { toast.error('Gagal mengambil data'); return }
+    const { participants } = await res.json()
+    if (!participants || participants.length === 0) {
+      toast.error('Belum ada peserta'); return
+    }
+
+    const header = 'Nama,Email,WhatsApp,No.Registrasi,Status,Check-In,Tanggal Daftar'
+    const rows = participants.map((p: any) =>
+      [
+        `"${p.name}"`, `"${p.email}"`, p.whatsapp,
+        p.registration_number || '', p.status === 'verified' ? 'Terverifikasi' : p.status === 'checked_in' ? 'Check-in' : 'Pending',
+        p.is_checked_in ? 'Ya' : 'Tidak',
+        new Date(p.created_at).toLocaleDateString('id-ID'),
+      ].join(',')
+    ).join('\n')
+
+    const blob = new Blob(['\ufeff' + header + '\n' + rows], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `peserta_${event.slug}_${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Berhasil mengunduh ${participants.length} peserta`)
+  }
+
   const totalPages = Math.ceil(total / PER_PAGE)
 
   return (
@@ -120,6 +152,9 @@ export default function AdminEventsPage() {
                 <p className="text-sm text-gray-500">/{event.slug}</p>
               </div>
               <Toggle checked={!!event.is_active} onChange={() => handleToggleActive(event)} />
+              <button onClick={() => handleExport(event)} className="p-2 rounded-lg hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-300 transition-colors" title="Unduh data peserta (CSV)">
+                <Download size={16} />
+              </button>
               <button onClick={() => setDeleteTarget(event)} className="p-2 rounded-lg hover:bg-rose-500/10 text-gray-400 hover:text-rose-300 transition-colors" title="Hapus event">
                 <Trash2 size={16} />
               </button>

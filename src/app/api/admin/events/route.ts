@@ -54,6 +54,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
+    if (action === 'export_participants') {
+      const { data: participants, error } = await supabase
+        .from('participants')
+        .select('name, email, whatsapp, registration_number, status, is_checked_in, payment_proof_url, created_at')
+        .eq('event_id', data.id)
+        .order('created_at', { ascending: false })
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json({ participants: participants || [] })
+    }
+
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
   } catch (err: unknown) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Server error' }, { status: 500 })
