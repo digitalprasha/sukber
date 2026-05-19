@@ -31,7 +31,7 @@ export default function EditEventPage() {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
-  const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: 'SBS', description: '' })
+  const [form, setForm] = useState({ title: '', slug: '', ticket_prefix: '', description: '' })
   const [fee, setFee] = useState('')
   const [maxPax, setMaxPax] = useState('')
   const [deadline, setDeadline] = useState('')
@@ -169,8 +169,9 @@ export default function EditEventPage() {
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Kode Event</label>
               <input value={form.ticket_prefix} onChange={(e) => setForm({ ...form, ticket_prefix: e.target.value })}
+                placeholder="VOL8"
                 className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 text-sm" required />
-              <p className="text-[11px] text-gray-600 mt-1">Kode singkat event, contoh: <span className="text-emerald-400">VOL8</span>. Hasil akhir nomor registrasi: <span className="text-emerald-400">SBS-VOL8-001</span></p>
+              <p className="text-[11px] text-gray-600 mt-1">Cukup isi kode event saja (contoh: <span className="text-emerald-400">VOL8</span>). Hasil akhir: <span className="text-emerald-400">SBS-VOL8-001</span>. <span className="text-gray-500">SBS</span> dan nomor urut ditambahkan otomatis.</p>
             </div>
           </div>
           <div>
