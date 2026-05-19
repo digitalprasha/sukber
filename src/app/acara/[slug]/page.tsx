@@ -1,11 +1,10 @@
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
-import { RegistrationForm } from '@/components/events/RegistrationForm'
+import { RegisterSection } from '@/components/events/RegisterSection'
 import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
 import { ShareButton } from '@/components/ui/ShareButton'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { Banknote, Wallet, Building2 } from 'lucide-react'
 import type { Metadata } from 'next'
 
 interface PaymentMethod {
@@ -100,45 +99,16 @@ export default async function EventDetailPage({ params }: Props) {
 
           <div>
             <div className="sticky top-24 space-y-6">
-              {event.registration_enabled !== false && (
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-                  <h2 className="text-xl font-semibold text-white mb-6">Pendaftaran</h2>
-
-                  {paymentMethods.length > 0 && (
-                    <div className="mb-6 rounded-xl bg-emerald-500/5 border border-emerald-500/20 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-emerald-500/10">
-                        <h3 className="text-sm font-medium text-emerald-300">Metode Pembayaran</h3>
-                      </div>
-                      <div className="divide-y divide-emerald-500/10">
-                        {paymentMethods.map((pm, i) => (
-                          <div key={i} className="flex items-center gap-3 px-4 py-3">
-                            {pm.type === 'bank' ? (
-                              <Building2 size={18} className="text-emerald-400 shrink-0" />
-                            ) : (
-                              <Wallet size={18} className="text-amber-400 shrink-0" />
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-gray-500 uppercase tracking-wide">{pm.type === 'bank' ? 'BANK' : 'E-WALLET'}</p>
-                              <p className="text-sm font-medium text-white">{pm.name}</p>
-                            </div>
-                            <p className="text-sm font-semibold text-emerald-200 tabular-nums">{pm.number}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <RegistrationForm
-                    eventId={event.id}
-                    ticketPrefix={event.ticket_prefix}
-                    fee={event.registration_fee}
-                    maxParticipants={event.max_participants}
-                    deadline={event.registration_deadline}
-                  />
-                </div>
-              )}
-
-              {event.registration_enabled === false && (
+              {event.registration_enabled !== false ? (
+                <RegisterSection
+                  eventId={event.id}
+                  ticketPrefix={event.ticket_prefix}
+                  fee={event.registration_fee}
+                  maxParticipants={event.max_participants}
+                  deadline={event.registration_deadline}
+                  paymentMethods={paymentMethods}
+                />
+              ) : (
                 <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
                   <p className="text-gray-500">Pendaftaran untuk acara ini sedang ditutup</p>
                 </div>

@@ -34,7 +34,7 @@ export function EventCard({ event }: EventCardProps) {
         </p>
         <div className="mt-auto pt-3">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-amber-500 rounded-xl text-white text-sm font-medium group-hover:shadow-lg group-hover:shadow-emerald-500/25 transition-all duration-300">
-            Daftar Sekarang
+            Lihat Detail
           </span>
         </div>
       </div>
