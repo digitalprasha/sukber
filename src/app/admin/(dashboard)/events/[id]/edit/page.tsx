@@ -231,13 +231,6 @@ export default function EditEventPage() {
                   <p className="text-[11px] text-amber-300/70">⚠️ Pastikan nomor rekening/e-wallet sudah benar. Kesalahan nomor bisa menyebabkan kerugian.</p>
                 </div>
                 {payments.length === 0 && <p className="text-xs text-gray-600 italic">Belum ada metode pembayaran. Klik "Tambah" untuk menambahkan.</p>}
-                {payments.length > 0 && (
-                  <label className="flex items-start gap-2 mb-3 cursor-pointer">
-                    <input type="checkbox" checked={payConfirmed} onChange={e => setPayConfirmed(e.target.checked)}
-                      className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 accent-emerald-500" />
-                    <span className="text-xs text-gray-500 leading-relaxed">Saya telah memeriksa dan memastikan nomor rekening/e-wallet di atas sudah benar</span>
-                  </label>
-                )}
                 {payments.map((pm, i) => (
                   <div key={i} className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 mb-2">
                     <div className="shrink-0 mt-2">{pm.type === 'bank' ? <Banknote size={16} className="text-emerald-500" /> : <Wallet size={16} className="text-amber-500" />}</div>
@@ -300,6 +293,13 @@ export default function EditEventPage() {
           ))}
         </div>
 
+        {payments.length > 0 && (
+          <label className="flex items-start gap-2 pt-2 cursor-pointer">
+            <input type="checkbox" checked={payConfirmed} onChange={e => setPayConfirmed(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 accent-emerald-500 shrink-0" />
+            <span className="text-xs text-gray-500 leading-relaxed">Saya telah memeriksa dan memastikan nomor rekening/e-wallet sudah benar</span>
+          </label>
+        )}
         <div className="flex gap-4 pt-2">
           <Button type="submit" loading={loading}>Simpan</Button>
           <Button type="button" variant="ghost" onClick={() => router.back()}>Batal</Button>
