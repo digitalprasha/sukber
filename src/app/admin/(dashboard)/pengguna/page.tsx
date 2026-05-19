@@ -97,7 +97,8 @@ export default function PenggunaPage() {
         </Button>
       </div>
 
-      <div className="rounded-2xl border border-white/10 overflow-hidden">
+      <div className="overflow-x-auto">
+        <div className="rounded-2xl border border-white/10 min-w-[600px]">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/10 bg-white/5">
@@ -167,6 +168,7 @@ export default function PenggunaPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {showAdd && (

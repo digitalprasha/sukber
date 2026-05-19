@@ -147,7 +147,8 @@ export default function AdminPartnersPage() {
       {partners.length === 0 ? (
         <div className="text-center py-20 text-gray-500">Belum ada partner</div>
       ) : (
-        <div className="rounded-2xl border border-white/10 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="rounded-2xl border border-white/10 min-w-[600px]">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/10 bg-white/5">
@@ -184,6 +185,7 @@ export default function AdminPartnersPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

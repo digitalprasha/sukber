@@ -168,7 +168,22 @@ export default function AdminEventsPage() {
                 <h3 className="font-medium text-white text-sm sm:text-base truncate">{event.title}</h3>
                 <p className="text-xs sm:text-sm text-gray-500 truncate">/{event.slug}</p>
               </div>
-              <div className="relative shrink-0">
+              <div className="hidden lg:flex items-center gap-1 shrink-0">
+                <Toggle checked={!!event.is_active} onChange={() => handleToggleActive(event)} />
+                <button onClick={() => handleExport(event)} className="p-2 rounded-lg hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-300 transition-colors" title="Unduh data peserta (CSV)">
+                  <Download size={16} />
+                </button>
+                <a href={`/admin/events/${event.id}/edit`} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+                  <Pencil size={18} />
+                </a>
+                <button onClick={() => setResetTarget(event)} className="p-2 rounded-lg hover:bg-amber-500/10 text-gray-400 hover:text-amber-300 transition-colors" title="Reset peserta & sponsor">
+                  <RotateCcw size={16} />
+                </button>
+                <button onClick={() => setDeleteTarget(event)} className="p-2 rounded-lg hover:bg-rose-500/10 text-gray-400 hover:text-rose-300 transition-colors" title="Hapus event">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+              <div className="relative shrink-0 lg:hidden">
                 <button onClick={() => setOpenMenu(openMenu === event.id ? null : event.id)}
                   className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
                   <MoreVertical size={18} />
