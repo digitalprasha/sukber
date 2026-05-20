@@ -32,7 +32,7 @@ export default function TicketsPage() {
   const [rejectTarget, setRejectTarget] = useState<Participant | null>(null)
   const [rejectReason, setRejectReason] = useState('')
   const [rejectChannel, setRejectChannel] = useState<'wa' | 'email'>('wa')
-  const [rejectLoading, setRejectLoading] = useState(false)
+  const linkRef = useRef<HTMLAnchorElement>(null)
   const loaded = useRef(false)
 
   const reload = () => {
@@ -93,27 +93,31 @@ export default function TicketsPage() {
     }
   }
 
-  async function handleSendMessage() {
+  function handleSendMessage() {
     if (!rejectTarget || !rejectReason.trim()) {
       toast.error('Harap isi pesan')
       return
     }
-    setRejectLoading(true)
 
     const { name, whatsapp, email } = rejectTarget
     const waText = `Hi ${name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
     const emailSubject = 'Pesan dari Admin - SukaBernyanyi'
     const emailBody = `Hi ${name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
 
-    if (rejectChannel === 'wa') window.open(getWaUrl(whatsapp, waText), '_blank')
-    else window.open(getEmailUrl(email, emailSubject, emailBody), '_blank')
+    const url = rejectChannel === 'wa'
+      ? getWaUrl(whatsapp, waText)
+      : getEmailUrl(email, emailSubject, emailBody)
+
+    if (linkRef.current) {
+      linkRef.current.href = url
+      linkRef.current.click()
+    }
 
     toast.success(`Membuka ${rejectChannel === 'wa' ? 'WhatsApp' : 'Email'} untuk ${name}`)
 
     setRejectTarget(null)
     setRejectReason('')
     setRejectChannel('wa')
-    setRejectLoading(false)
     reload()
   }
 
@@ -289,7 +293,8 @@ export default function TicketsPage() {
       />
 
       {rejectTarget && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => !rejectLoading && setRejectTarget(null)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setRejectTarget(null)}>
+          <a ref={linkRef} target="_blank" rel="noopener noreferrer" className="hidden" />
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div className="relative w-full max-w-md rounded-2xl border border-[var(--color-card-border)] bg-[var(--color-card)] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
             <div className="text-center mb-4">
@@ -321,13 +326,13 @@ export default function TicketsPage() {
               </label>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setRejectTarget(null); setRejectReason(''); setRejectChannel('wa') }} disabled={rejectLoading}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--color-card-border)] text-[var(--color-text-secondary)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)] transition-all text-sm font-medium disabled:opacity-50">
+              <button onClick={() => { setRejectTarget(null); setRejectReason(''); setRejectChannel('wa') }}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--color-card-border)] text-[var(--color-text-secondary)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)] transition-all text-sm font-medium">
                 Batal
               </button>
-              <button onClick={handleSendMessage} disabled={rejectLoading || !rejectReason.trim()}
+              <button onClick={handleSendMessage} disabled={!rejectReason.trim()}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-all disabled:opacity-50">
-                {rejectLoading ? 'Mengirim...' : 'Kirim Pesan'}
+                Kirim Pesan
               </button>
             </div>
           </div>
