@@ -108,20 +108,7 @@ export default function TicketsPage() {
     if (rejectChannel === 'wa') window.open(getWaUrl(whatsapp, waText), '_blank')
     else window.open(getEmailUrl(email, emailSubject, emailBody), '_blank')
 
-    const { data: { user } } = await supabase.auth.getUser()
-    fetch('/api/admin/tickets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'send_message',
-        id: rejectTarget.id,
-        name,
-        message: rejectReason.trim(),
-        user_email: user?.email,
-      }),
-    }).then(res => {
-      if (res.ok) toast.success(`Pesan ${rejectChannel === 'wa' ? 'WA' : 'Email'} terkirim ke ${name}`)
-    })
+    toast.success(`Membuka ${rejectChannel === 'wa' ? 'WhatsApp' : 'Email'} untuk ${name}`)
 
     setRejectTarget(null)
     setRejectReason('')

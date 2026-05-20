@@ -188,29 +188,53 @@
   color: #9ca3af !important;
 }
 
-.light .admin-dashboard button:not(.bg-emerald-500):not(.bg-emerald-600):not(.bg-emerald-700):not(.bg-gradient-to-r):not(.bg-rose-500\/20):not(.bg-rose-600):not(.bg-emerald-500\/10):not(.bg-rose-500\/10):not(.bg-red-600):not(.bg-red-500):not(.bg-amber-600):not(.bg-green-600):not(.bg-green-500\/20):not(.bg-blue-500\/20) {
+.light .admin-dashboard button:not(.bg-green-500\/20):not(.bg-blue-500\/20):not(.bg-rose-500\/20):not(.bg-emerald-500\/10):not(.bg-rose-500\/10) {
   color: #374151;
 }
 
+.light .admin-dashboard button.bg-gradient-to-r {
+  background: #059669 !important;
+  color: #ffffff !important;
+}
+
 .light .admin-dashboard button.bg-emerald-600,
-.light .admin-dashboard button.bg-emerald-700,
+.light .admin-dashboard button.bg-emerald-700 {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
 .light .admin-dashboard button.bg-rose-600,
 .light .admin-dashboard button.bg-red-600,
-.light .admin-dashboard button.bg-red-500,
-.light .admin-dashboard button.bg-amber-600,
-.light .admin-dashboard button.bg-green-600,
+.light .admin-dashboard button.bg-red-500 {
+  background-color: #fce4ec !important;
+  color: #b71c1c !important;
+}
+
+.light .admin-dashboard button.bg-amber-600 {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.light .admin-dashboard button.bg-green-600 {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
 .light .admin-dashboard a.bg-emerald-600,
 .light .admin-dashboard a.bg-rose-600,
-.light .admin-dashboard a.bg-red-600,
-.light .admin-dashboard a.bg-green-500\/20,
-.light .admin-dashboard a.bg-blue-500\/20,
-.light .admin-dashboard .bg-emerald-600,
-.light .admin-dashboard .bg-rose-600,
-.light .admin-dashboard .bg-red-600,
-.light .admin-dashboard .bg-red-500,
-.light .admin-dashboard .bg-amber-600,
-.light .admin-dashboard .bg-green-600 {
-  color: #ffffff !important;
+.light .admin-dashboard a.bg-red-600 {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.light .admin-dashboard a.bg-green-500\/20 {
+  background-color: rgba(5,150,105,0.12) !important;
+  color: #047857 !important;
+}
+
+.light .admin-dashboard a.bg-blue-500\/20 {
+  background-color: rgba(37,99,235,0.1) !important;
+  color: #1d4ed8 !important;
 }
 
 .light .admin-dashboard .bg-\[var\(--background\)\] {
