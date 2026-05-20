@@ -42,11 +42,15 @@ export default function ScannerPage() {
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 250, height: 250 } },
         (decodedText: string) => {
-          const regNumber = decodedText.trim().split('/').pop() || decodedText.trim()
-          handleCheckIn(regNumber)
-          scanner.stop().catch(() => {})
-          setScanning(false)
-        },
+            let regNumber = decodedText.trim()
+            try {
+              const url = new URL(regNumber)
+              regNumber = url.pathname.split('/').pop() || ''
+            } catch {}
+            if (regNumber) handleCheckIn(regNumber)
+            scanner.stop().catch(() => {})
+            setScanning(false)
+          },
         () => {}
       )
     } catch (err: any) {
