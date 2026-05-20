@@ -27,7 +27,7 @@ const navItems = [
   { href: '/admin/news', label: 'Berita', icon: Newspaper },
   { href: '/admin/gallery', label: 'Galeri', icon: ImageIcon },
   { href: '/admin/faqs', label: 'FAQ', icon: HelpCircle },
-  { href: '/admin/partners', label: 'Partners', icon: Handshake },
+  { href: '/admin/partners', label: 'Mitra', icon: Handshake },
   { href: '/admin/tickets', label: 'Tickets', icon: Ticket },
   { href: '/admin/scanner', label: 'Scanner', icon: QrCode },
   { href: '/admin/pengguna', label: 'Pengguna', icon: Users, adminOnly: true },

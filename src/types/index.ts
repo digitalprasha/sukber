@@ -33,8 +33,14 @@ export interface Event {
   flyer_url: string
   ticket_prefix: string
   description: string
+  registration_enabled?: boolean
+  registration_fee?: number | null
+  max_participants?: number | null
+  registration_deadline?: string | null
+  payment_methods?: unknown
+  is_active?: boolean
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 export interface Sponsor {

@@ -215,14 +215,14 @@ export function ParallaxHero() {
           style={{ animationDelay: '0.7s' }}
         >
           <Link
-            href="/#berita"
+            href="/berita"
             className="group relative px-10 py-4 bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 rounded-2xl font-semibold text-white shadow-2xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 overflow-hidden"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             <span className="relative tracking-wide">Jelajahi Berita</span>
           </Link>
           <Link
-            href="/#acara"
+            href="/acara"
             className="group relative px-10 py-4 rounded-2xl font-semibold text-white/80 border border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 overflow-hidden backdrop-blur-md"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />

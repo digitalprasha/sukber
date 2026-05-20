@@ -11,8 +11,7 @@ const links = [
   { href: '/berita', label: 'Berita' },
   { href: '/acara', label: 'Acara' },
   { href: '/galeri', label: 'Galeri' },
-  { href: '/#partners', label: 'Mitra' },
-  { href: '/#faq', label: 'FAQ' },
+
 ]
 
 function MusicNoteIcon() {

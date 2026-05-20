@@ -5,6 +5,8 @@ import { SanitizedHtml } from '@/components/editor/SanitizedHtml'
 import { ShareButton } from '@/components/ui/ShareButton'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { getEventCategory, EVENT_CATEGORY_LABELS, EVENT_CATEGORY_COLORS, formatDate } from '@/lib/utils'
+import { CalendarDays, Clock, Ticket, Users } from 'lucide-react'
 import type { Metadata } from 'next'
 
 interface PaymentMethod {
@@ -72,10 +74,42 @@ export default async function EventDetailPage({ params }: Props) {
               </div>
             )}
 
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h1>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`px-3 py-1 rounded-lg text-xs font-semibold border ${EVENT_CATEGORY_COLORS[getEventCategory(event)]}`}>
+                    {EVENT_CATEGORY_LABELS[getEventCategory(event)]}
+                  </span>
+                  {event.registration_fee && Number(event.registration_fee) > 0 && (
+                    <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                      Rp{Number(event.registration_fee).toLocaleString('id-ID')}
+                    </span>
+                  )}
+                </div>
+                <h1 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h1>
+              </div>
               <ShareButton url={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://suka-bernyanyi-smi.vercel.app'}/acara/${event.slug}`} title={event.title} />
             </div>
+
+            <div className="flex flex-wrap gap-3 mb-6 text-sm">
+              {event.registration_deadline && (
+                <div className="flex items-center gap-1.5 text-gray-400 bg-white/5 px-3 py-1.5 rounded-lg">
+                  <CalendarDays size={14} />
+                  <span>Deadline: {formatDate(event.registration_deadline)}</span>
+                </div>
+              )}
+              {event.max_participants && (
+                <div className="flex items-center gap-1.5 text-gray-400 bg-white/5 px-3 py-1.5 rounded-lg">
+                  <Users size={14} />
+                  <span>Kuota: {event.max_participants} peserta</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 text-gray-400 bg-white/5 px-3 py-1.5 rounded-lg">
+                <Ticket size={14} />
+                <span>Kode: {event.ticket_prefix || '-'}</span>
+              </div>
+            </div>
+
             <SanitizedHtml
               className="prose prose-invert prose-emerald max-w-none text-gray-400"
               html={event.description}
