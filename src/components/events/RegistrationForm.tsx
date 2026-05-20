@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
-import { Upload, CheckCircle, AlertCircle, Clock, Users, Coins } from 'lucide-react'
+import { Upload, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
 
 interface RegistrationFormProps {
   eventId: string
@@ -88,25 +88,12 @@ export function RegistrationForm({ eventId, fee, maxParticipants, deadline }: Re
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {(fee || maxParticipants) && (
+      {maxParticipants && (
         <div className="flex flex-wrap gap-3 mb-2">
-          {fee !== undefined && fee > 0 && (
-            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
-              <Coins size={12} />
-              Rp {fee.toLocaleString('id-ID')}
-            </div>
-          )}
-          {fee === 0 && (
-            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-              Gratis
-            </div>
-          )}
-          {maxParticipants && (
-            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
-              <Users size={12} />
-              Sisa {maxParticipants} kursi
-            </div>
-          )}
+          <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+            <Users size={12} />
+            Sisa {maxParticipants} kursi
+          </div>
           {deadline && (
             <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
               <Clock size={12} />

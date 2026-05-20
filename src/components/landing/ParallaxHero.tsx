@@ -138,7 +138,7 @@ export function ParallaxHero() {
       style={{ perspective: '1px', transformStyle: 'preserve-3d' }}
     >
       {/* Animated gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden" style={parallaxStyle(0.3)}>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={parallaxStyle(0.3)}>
         <div
           className="absolute -top-1/2 -left-1/2 w-[120%] h-[120%] animate-slow-spin opacity-30"
           style={{
@@ -158,12 +158,12 @@ export function ParallaxHero() {
       </div>
 
       {/* Sound wave visualization */}
-      <div className="absolute inset-0 z-[1]" style={parallaxStyle(0.25)}>
+      <div className="absolute inset-0 z-[1] pointer-events-none" style={parallaxStyle(0.25)}>
         <SoundWave />
       </div>
 
       {/* Floating notes layer */}
-      <div className="absolute inset-0 z-[2]" style={parallaxStyle(0.6)}>
+      <div className="absolute inset-0 z-[2] pointer-events-none" style={parallaxStyle(0.6)}>
         {Array.from({ length: 12 }).map((_, i) => (
           <FloatingNote
             key={i}
