@@ -55,6 +55,10 @@ export function getWaUrl(phone: string, text: string) {
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`
 }
 
-export function getMailtoUrl(email: string, subject: string, body: string) {
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+export function getEmailUrl(email: string, subject: string, body: string) {
+  const params = new URLSearchParams({
+    view: 'cm', fs: '1', to: email,
+    su: subject, body,
+  })
+  return `https://mail.google.com/mail/?${params.toString()}`
 }

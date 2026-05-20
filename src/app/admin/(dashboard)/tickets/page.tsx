@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { TableSkeleton } from '@/components/ui/Skeleton'
-import { getWaUrl, getMailtoUrl } from '@/lib/utils'
+import { getWaUrl, getEmailUrl } from '@/lib/utils'
 import { CheckCircle, XCircle, Send, ExternalLink, Search, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -123,7 +123,7 @@ export default function TicketsPage() {
       const emailBody = `Hi ${rejectTarget.name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
 
       window.open(getWaUrl(rejectTarget.whatsapp, waText), '_blank')
-      window.open(getMailtoUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
+      window.open(getEmailUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
 
       setRejectTarget(null)
       setRejectReason('')
@@ -222,7 +222,7 @@ export default function TicketsPage() {
                               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors">
                               <Send size={14} /> WA
                             </a>
-                            <a href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi',
+                            <a href={getEmailUrl(p.email, 'Tiket Anda - SukaBernyanyi',
                               `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
                               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors">
                               <Send size={14} /> Email
@@ -277,7 +277,7 @@ export default function TicketsPage() {
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors">
                         <Send size={12} /> WA
                       </a>
-                      <a href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi',
+                      <a href={getEmailUrl(p.email, 'Tiket Anda - SukaBernyanyi',
                         `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors">
                         <Send size={12} /> Email
