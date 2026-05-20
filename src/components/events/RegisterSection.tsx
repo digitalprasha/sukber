@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { RegistrationForm } from './RegistrationForm'
-import { Building2, Wallet, Copy, Check } from 'lucide-react'
+import { Building2, Wallet, Copy, Check, Lock, Clock } from 'lucide-react'
 import { toast } from 'sonner'
+import { formatDate } from '@/lib/utils'
 
 interface PaymentMethod {
   type: 'bank' | 'ewallet'
@@ -18,9 +19,10 @@ interface RegisterSectionProps {
   maxParticipants?: number | null
   deadline?: string | null
   paymentMethods: PaymentMethod[]
+  category: 'coming_soon' | 'upcoming' | 'past'
 }
 
-export function RegisterSection({ eventId, ticketPrefix, fee, maxParticipants, deadline, paymentMethods }: RegisterSectionProps) {
+export function RegisterSection({ eventId, ticketPrefix, fee, maxParticipants, deadline, paymentMethods, category }: RegisterSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
@@ -32,9 +34,48 @@ export function RegisterSection({ eventId, ticketPrefix, fee, maxParticipants, d
     setTimeout(() => setCopiedId(null), 2000)
   }
 
+  if (category === 'past') {
+    return (
+      <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
+        <Lock size={32} className="mx-auto mb-3 text-gray-500" />
+        <p className="text-gray-400 font-medium">Acara Telah Dilaksanakan</p>
+        <p className="text-xs text-gray-600 mt-1">Pendaftaran untuk acara ini sudah ditutup</p>
+      </div>
+    )
+  }
+
+  if (category === 'coming_soon') {
+    return (
+      <div className="rounded-2xl bg-white/5 border border-amber-500/20 p-6 text-center">
+        <Clock size={32} className="mx-auto mb-3 text-amber-400" />
+        <p className="text-amber-300 font-medium">Coming Soon</p>
+        <p className="text-xs text-gray-500 mt-1">Pendaftaran akan segera dibuka</p>
+        {deadline && (
+          <p className="text-xs text-gray-600 mt-2">Batas pendaftaran: {formatDate(deadline)}</p>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-      <h2 className="text-xl font-semibold text-white mb-4">Pendaftaran</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-white">Pendaftaran</h2>
+        {fee && Number(fee) > 0 && (
+          <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 text-sm font-semibold border border-emerald-500/20">
+            Rp{Number(fee).toLocaleString('id-ID')}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4 text-xs text-gray-500">
+        {deadline && (
+          <span className="px-2 py-1 rounded-lg bg-white/5">Deadline: {formatDate(deadline)}</span>
+        )}
+        {maxParticipants && (
+          <span className="px-2 py-1 rounded-lg bg-white/5">Kuota: {maxParticipants} peserta</span>
+        )}
+      </div>
 
       {paymentMethods.length > 0 && (
         <div className="mb-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 overflow-hidden">

@@ -48,6 +48,7 @@ export default async function EventDetailPage({ params }: Props) {
   if (!event) notFound()
 
   const paymentMethods: PaymentMethod[] = Array.isArray(event.payment_methods) ? event.payment_methods : []
+  const category = getEventCategory(event)
 
   const { data: sponsors } = await supabase
     .from('sponsors')
@@ -133,20 +134,15 @@ export default async function EventDetailPage({ params }: Props) {
 
           <div>
             <div className="sticky top-24 space-y-6">
-              {event.registration_enabled !== false ? (
-                <RegisterSection
-                  eventId={event.id}
-                  ticketPrefix={event.ticket_prefix}
-                  fee={event.registration_fee}
-                  maxParticipants={event.max_participants}
-                  deadline={event.registration_deadline}
-                  paymentMethods={paymentMethods}
-                />
-              ) : (
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
-                  <p className="text-gray-500">Pendaftaran untuk acara ini sedang ditutup</p>
-                </div>
-              )}
+              <RegisterSection
+                eventId={event.id}
+                ticketPrefix={event.ticket_prefix}
+                fee={event.registration_fee}
+                maxParticipants={event.max_participants}
+                deadline={event.registration_deadline}
+                paymentMethods={paymentMethods}
+                category={category}
+              />
             </div>
           </div>
         </div>
