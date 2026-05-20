@@ -31,6 +31,7 @@ export default function TicketsPage() {
   const [approveTarget, setApproveTarget] = useState<Participant | null>(null)
   const [rejectTarget, setRejectTarget] = useState<Participant | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [rejectChannels, setRejectChannels] = useState({ wa: true, email: true })
   const [rejectLoading, setRejectLoading] = useState(false)
   const loaded = useRef(false)
 
@@ -122,11 +123,12 @@ export default function TicketsPage() {
       const emailSubject = 'Pesan dari Admin - SukaBernyanyi'
       const emailBody = `Hi ${rejectTarget.name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
 
-      window.open(getWaUrl(rejectTarget.whatsapp, waText), '_blank')
-      window.open(getEmailUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
+      if (rejectChannels.wa) window.open(getWaUrl(rejectTarget.whatsapp, waText), '_blank')
+      if (rejectChannels.email) window.open(getEmailUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
 
       setRejectTarget(null)
       setRejectReason('')
+      setRejectChannels({ wa: true, email: true })
       setRejectLoading(false)
       reload()
     }
@@ -306,28 +308,41 @@ export default function TicketsPage() {
       {rejectTarget && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => !rejectLoading && setRejectTarget(null)}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a1a12] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
+          <div className="relative w-full max-w-md rounded-2xl border border-[var(--color-card-border)] bg-[var(--color-card)] shadow-2xl p-6" onClick={e => e.stopPropagation()}>
             <div className="text-center mb-4">
               <div className="mx-auto w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-3">
                 <AlertTriangle className="text-rose-400" size={24} />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-1">Kirim Pesan ke {rejectTarget.name}</h3>
-              <p className="text-sm text-gray-400">Pesan akan dikirim via WhatsApp & Email. Status peserta tetap pending.</p>
+              <h3 className="text-lg font-semibold text-[var(--foreground)] mb-1">Kirim Pesan ke {rejectTarget.name}</h3>
+              <p className="text-sm text-[var(--color-text-secondary)]">Pesan akan dicatat. Status peserta tetap pending.</p>
             </div>
               <textarea
               value={rejectReason}
               onChange={e => setRejectReason(e.target.value)}
               placeholder="Tulis pesan untuk peserta..."
               rows={4}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none text-sm mb-4"
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-input-bg)] border border-[var(--color-input-border)] text-[var(--foreground)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none text-sm mb-4"
             />
-            <p className="text-xs text-gray-500 mb-4">Pesan akan dikirim via WhatsApp & Email ke peserta.</p>
+            <div className="space-y-2 mb-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={rejectChannels.wa}
+                  onChange={e => setRejectChannels(p => ({ ...p, wa: e.target.checked }))}
+                  className="w-4 h-4 rounded border-[var(--color-input-border)] bg-[var(--color-input-bg)] accent-emerald-500" />
+                <span className="text-sm text-[var(--color-text-secondary)]">Kirim via WhatsApp</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={rejectChannels.email}
+                  onChange={e => setRejectChannels(p => ({ ...p, email: e.target.checked }))}
+                  className="w-4 h-4 rounded border-[var(--color-input-border)] bg-[var(--color-input-bg)] accent-emerald-500" />
+                <span className="text-sm text-[var(--color-text-secondary)]">Kirim via Email</span>
+              </label>
+            </div>
             <div className="flex gap-3">
-              <button onClick={() => { setRejectTarget(null); setRejectReason('') }} disabled={rejectLoading}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium disabled:opacity-50">
+              <button onClick={() => { setRejectTarget(null); setRejectReason(''); setRejectChannels({ wa: true, email: true }) }} disabled={rejectLoading}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--color-card-border)] text-[var(--color-text-secondary)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)] transition-all text-sm font-medium disabled:opacity-50">
                 Batal
               </button>
-              <button onClick={handleSendMessage} disabled={rejectLoading || !rejectReason.trim()}
+              <button onClick={handleSendMessage} disabled={rejectLoading || !rejectReason.trim() || (!rejectChannels.wa && !rejectChannels.email)}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-all disabled:opacity-50">
                 {rejectLoading ? 'Mengirim...' : 'Kirim Pesan'}
               </button>

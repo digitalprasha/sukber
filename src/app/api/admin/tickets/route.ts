@@ -28,9 +28,14 @@ export async function POST(request: NextRequest) {
     if (action === 'send_message') {
       const { error } = await supabase.from('participants').update({
         admin_note: data.message,
-      }).eq('id', data.id)
+      } as never).eq('id', data.id)
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      if (error) {
+        if (error.message?.includes('column') && error.message?.includes('admin_note')) {
+          return NextResponse.json({ error: 'Kolom admin_note belum ada. Jalankan: ALTER TABLE event_management.participants ADD COLUMN admin_note TEXT; di Supabase SQL Editor.' }, { status: 400 })
+        }
+        return NextResponse.json({ error: error.message }, { status: 400 })
+      }
 
       await supabase.from('audit_logs').insert({
         user_email: data.user_email || 'unknown',
