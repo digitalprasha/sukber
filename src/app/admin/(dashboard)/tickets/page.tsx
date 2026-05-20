@@ -169,71 +169,126 @@ export default function TicketsPage() {
       ) : participants.length === 0 ? (
         <div className="text-center py-20 text-gray-500">Tidak ada data peserta</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left py-3 px-4 text-gray-500 font-medium">Peserta</th>
-                <th className="text-left py-3 px-4 text-gray-500 font-medium">No. Registrasi</th>
-                <th className="text-left py-3 px-4 text-gray-500 font-medium">Status</th>
-                <th className="text-left py-3 px-4 text-gray-500 font-medium">Bukti</th>
-                <th className="text-left py-3 px-4 text-gray-500 font-medium">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {participants.map((p) => (
-                <tr key={p.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="py-3 px-4">
-                    <div>
-                      <p className="text-white font-medium">{p.name}</p>
-                      <p className="text-gray-500 text-xs">{p.email} / {p.whatsapp}</p>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="text-white font-mono">{p.registration_number || '-'}</span>
-                  </td>
-                  <td className="py-3 px-4">{statusBadge(p.status)}</td>
-                  <td className="py-3 px-4">
-                    {p.payment_proof_url ? (
-                      <a href={p.payment_proof_url} target="_blank"
-                        className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300">
-                        <ExternalLink size={14} /> Lihat
-                      </a>
-                    ) : <span className="text-gray-600">-</span>}
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      {p.status === 'pending' && (
-                        <>
-                          <Button size="sm" onClick={() => setApproveTarget(p)}>
-                            <CheckCircle size={14} className="mr-1" /> Approve
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => setRejectTarget(p)}>
-                            <XCircle size={14} />
-                          </Button>
-                        </>
-                      )}
-                      {p.registration_number && (
-                        <>
-                          <a href={getWaUrl(p.whatsapp, `Halo ${p.name}! Terima kasih telah mendaftar. Berikut tiket Anda: ${ticketUrl(p)}`)}
-                            target="_blank"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors">
-                            <Send size={14} /> WA
-                          </a>
-                          <a href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi',
-                            `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors">
-                            <Send size={14} /> Email
-                          </a>
-                        </>
-                      )}
-                    </div>
-                  </td>
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Peserta</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">No. Registrasi</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Status</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Bukti</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {participants.map((p) => (
+                  <tr key={p.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="py-3 px-4">
+                      <div>
+                        <p className="text-white font-medium">{p.name}</p>
+                        <p className="text-gray-500 text-xs">{p.email} / {p.whatsapp}</p>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="text-white font-mono">{p.registration_number || '-'}</span>
+                    </td>
+                    <td className="py-3 px-4">{statusBadge(p.status)}</td>
+                    <td className="py-3 px-4">
+                      {p.payment_proof_url ? (
+                        <a href={p.payment_proof_url} target="_blank"
+                          className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300">
+                          <ExternalLink size={14} /> Lihat
+                        </a>
+                      ) : <span className="text-gray-600">-</span>}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        {p.status === 'pending' && (
+                          <>
+                            <Button size="sm" onClick={() => setApproveTarget(p)}>
+                              <CheckCircle size={14} className="mr-1" /> Approve
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => setRejectTarget(p)}>
+                              <XCircle size={14} />
+                            </Button>
+                          </>
+                        )}
+                        {p.registration_number && (
+                          <>
+                            <a href={getWaUrl(p.whatsapp, `Halo ${p.name}! Terima kasih telah mendaftar. Berikut tiket Anda: ${ticketUrl(p)}`)}
+                              target="_blank"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors">
+                              <Send size={14} /> WA
+                            </a>
+                            <a href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi',
+                              `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors">
+                              <Send size={14} /> Email
+                            </a>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-3">
+            {participants.map((p) => (
+              <div key={p.id} className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white truncate">{p.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{p.email} / {p.whatsapp}</p>
+                  </div>
+                  <div className="shrink-0">{statusBadge(p.status)}</div>
+                </div>
+                <div className="text-xs text-gray-400 font-mono">
+                  {p.registration_number || '-'}
+                </div>
+                {p.payment_proof_url && (
+                  <a href={p.payment_proof_url} target="_blank"
+                    className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300">
+                    <ExternalLink size={12} /> Lihat Bukti Pembayaran
+                  </a>
+                )}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {p.status === 'pending' && (
+                    <>
+                      <Button size="sm" onClick={() => setApproveTarget(p)}>
+                        <CheckCircle size={14} className="mr-1" /> Approve
+                      </Button>
+                      <button onClick={() => setRejectTarget(p)}
+                        className="px-2 py-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-colors text-sm"
+                        title="Kirim Pesan">
+                        <XCircle size={16} />
+                      </button>
+                    </>
+                  )}
+                  {p.registration_number && (
+                    <>
+                      <a href={getWaUrl(p.whatsapp, `Halo ${p.name}! Terima kasih telah mendaftar. Berikut tiket Anda: ${ticketUrl(p)}`)}
+                        target="_blank"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-colors">
+                        <Send size={12} /> WA
+                      </a>
+                      <a href={getMailtoUrl(p.email, 'Tiket Anda - SukaBernyanyi',
+                        `Halo ${p.name}!\n\nTerima kasih telah mendaftar. Berikut tiket Anda:\n${ticketUrl(p)}\n\nSalam,\nSukaBernyanyi Sukabumi`)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors">
+                        <Send size={12} /> Email
+                      </a>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
