@@ -7,6 +7,7 @@ import type { Metadata } from 'next'
 
 interface Props {
   params: Promise<{ registrationNumber: string }>
+  searchParams: Promise<{ token?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -16,8 +17,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function TicketPage({ params }: Props) {
+export default async function TicketPage({ params, searchParams }: Props) {
   const { registrationNumber } = await params
+  const { token } = await searchParams
   const supabase = createAdminClient()
 
   const { data: participant } = await supabase
@@ -28,7 +30,14 @@ export default async function TicketPage({ params }: Props) {
 
   if (!participant) notFound()
 
-  const ticketUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/ticket/${registrationNumber}`
+  // Protect against brute-force: new tickets have a random token, require it in URL
+  if (participant.ticket_token && token !== participant.ticket_token) notFound()
+
+  const ticketToken = participant.ticket_token
+  const ticketUrlBase = process.env.NEXT_PUBLIC_SITE_URL || 'https://suka-bernyanyi-smi.vercel.app'
+  const ticketUrl = ticketToken
+    ? `${ticketUrlBase}/ticket/${registrationNumber}?token=${ticketToken}`
+    : `${ticketUrlBase}/ticket/${registrationNumber}`
   const qrDataUrl = await QRCode.toDataURL(ticketUrl, {
     width: 300,
     margin: 2,

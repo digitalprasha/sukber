@@ -16,7 +16,8 @@ const PER_PAGE = 15
 interface Participant {
   id: string; event_id: string; name: string; email: string; whatsapp: string
   payment_proof_url: string; registration_number: string | null; status: string
-  is_checked_in: boolean; created_at: string; events?: { title: string; ticket_prefix: string }
+  is_checked_in: boolean; created_at: string; ticket_token?: string | null
+  events?: { title: string; ticket_prefix: string }
 }
 
 export default function TicketsPage() {
@@ -121,7 +122,10 @@ export default function TicketsPage() {
     reload()
   }
 
-  const ticketUrl = (p: Participant) => `${window.location.origin}/ticket/${p.registration_number}`
+  const ticketUrl = (p: Participant) => {
+    const base = `${window.location.origin}/ticket/${p.registration_number}`
+    return p.ticket_token ? `${base}?token=${p.ticket_token}` : base
+  }
 
   const statusBadge = (status: string) => {
     switch (status) {

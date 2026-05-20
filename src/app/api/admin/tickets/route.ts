@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,11 +9,13 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
 
     if (action === 'verify_participant') {
+      const token = crypto.randomUUID()
       const count = data.current_count || 0
       const regNumber = `${data.ticket_prefix}-${String(count + 1).padStart(3, '0')}`
       const { error } = await supabase.from('participants').update({
         status: 'verified',
         registration_number: regNumber,
+        ticket_token: token,
       }).eq('id', data.id)
 
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
@@ -22,7 +25,7 @@ export async function POST(request: NextRequest) {
         action: 'VERIFY_PARTICIPANT',
         details: `Verifikasi peserta ${data.name} - No: ${regNumber}`,
       })
-      return NextResponse.json({ registration_number: regNumber })
+      return NextResponse.json({ registration_number: regNumber, ticket_token: token })
     }
 
     if (action === 'send_message') {
