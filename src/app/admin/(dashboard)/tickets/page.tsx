@@ -31,7 +31,7 @@ export default function TicketsPage() {
   const [approveTarget, setApproveTarget] = useState<Participant | null>(null)
   const [rejectTarget, setRejectTarget] = useState<Participant | null>(null)
   const [rejectReason, setRejectReason] = useState('')
-  const [rejectChannels, setRejectChannels] = useState({ wa: true, email: true })
+  const [rejectChannel, setRejectChannel] = useState<'wa' | 'email'>('wa')
   const [rejectLoading, setRejectLoading] = useState(false)
   const loaded = useRef(false)
 
@@ -99,39 +99,35 @@ export default function TicketsPage() {
       return
     }
     setRejectLoading(true)
+
+    const { name, whatsapp, email } = rejectTarget
+    const waText = `Hi ${name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
+    const emailSubject = 'Pesan dari Admin - SukaBernyanyi'
+    const emailBody = `Hi ${name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
+
+    if (rejectChannel === 'wa') window.open(getWaUrl(whatsapp, waText), '_blank')
+    else window.open(getEmailUrl(email, emailSubject, emailBody), '_blank')
+
     const { data: { user } } = await supabase.auth.getUser()
-    const res = await fetch('/api/admin/tickets', {
+    fetch('/api/admin/tickets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'send_message',
         id: rejectTarget.id,
-        name: rejectTarget.name,
+        name,
         message: rejectReason.trim(),
         user_email: user?.email,
       }),
+    }).then(res => {
+      if (res.ok) toast.success(`Pesan ${rejectChannel === 'wa' ? 'WA' : 'Email'} terkirim ke ${name}`)
     })
 
-    if (!res.ok) {
-      const result = await res.json()
-      toast.error(result.error || 'Gagal mengirim pesan')
-      setRejectLoading(false)
-    } else {
-      toast.success(`Pesan terkirim ke ${rejectTarget.name}`)
-
-      const waText = `Hi ${rejectTarget.name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
-      const emailSubject = 'Pesan dari Admin - SukaBernyanyi'
-      const emailBody = `Hi ${rejectTarget.name},\n\nPesan dari admin SukaBernyanyi:\n${rejectReason}\n\nSilakan hubungi kami jika ada pertanyaan lebih lanjut.\n\nTerima kasih.`
-
-      if (rejectChannels.wa) window.open(getWaUrl(rejectTarget.whatsapp, waText), '_blank')
-      if (rejectChannels.email) window.open(getEmailUrl(rejectTarget.email, emailSubject, emailBody), '_blank')
-
-      setRejectTarget(null)
-      setRejectReason('')
-      setRejectChannels({ wa: true, email: true })
-      setRejectLoading(false)
-      reload()
-    }
+    setRejectTarget(null)
+    setRejectReason('')
+    setRejectChannel('wa')
+    setRejectLoading(false)
+    reload()
   }
 
   const ticketUrl = (p: Participant) => `${window.location.origin}/ticket/${p.registration_number}`
@@ -325,24 +321,24 @@ export default function TicketsPage() {
             />
             <div className="space-y-2 mb-4">
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={rejectChannels.wa}
-                  onChange={e => setRejectChannels(p => ({ ...p, wa: e.target.checked }))}
-                  className="w-4 h-4 rounded border-[var(--color-input-border)] bg-[var(--color-input-bg)] accent-emerald-500" />
+                <input type="radio" name="rejectChannel" value="wa" checked={rejectChannel === 'wa'}
+                  onChange={() => setRejectChannel('wa')}
+                  className="w-4 h-4 border-[var(--color-input-border)] bg-[var(--color-input-bg)] accent-emerald-500" />
                 <span className="text-sm text-[var(--color-text-secondary)]">Kirim via WhatsApp</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={rejectChannels.email}
-                  onChange={e => setRejectChannels(p => ({ ...p, email: e.target.checked }))}
-                  className="w-4 h-4 rounded border-[var(--color-input-border)] bg-[var(--color-input-bg)] accent-emerald-500" />
+                <input type="radio" name="rejectChannel" value="email" checked={rejectChannel === 'email'}
+                  onChange={() => setRejectChannel('email')}
+                  className="w-4 h-4 border-[var(--color-input-border)] bg-[var(--color-input-bg)] accent-emerald-500" />
                 <span className="text-sm text-[var(--color-text-secondary)]">Kirim via Email</span>
               </label>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => { setRejectTarget(null); setRejectReason(''); setRejectChannels({ wa: true, email: true }) }} disabled={rejectLoading}
+              <button onClick={() => { setRejectTarget(null); setRejectReason(''); setRejectChannel('wa') }} disabled={rejectLoading}
                 className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--color-card-border)] text-[var(--color-text-secondary)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)] transition-all text-sm font-medium disabled:opacity-50">
                 Batal
               </button>
-              <button onClick={handleSendMessage} disabled={rejectLoading || !rejectReason.trim() || (!rejectChannels.wa && !rejectChannels.email)}
+              <button onClick={handleSendMessage} disabled={rejectLoading || !rejectReason.trim()}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-all disabled:opacity-50">
                 {rejectLoading ? 'Mengirim...' : 'Kirim Pesan'}
               </button>

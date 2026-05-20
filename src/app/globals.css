@@ -99,6 +99,45 @@
   color: #9ca3af;
 }
 
+.light .admin-dashboard .text-emerald-300,
+.light .admin-dashboard .text-green-300,
+.light .admin-dashboard .text-yellow-300 {
+  color: #047857;
+}
+
+.light .admin-dashboard .text-rose-300 {
+  color: #be123c;
+}
+
+.light .admin-dashboard .text-amber-300 {
+  color: #b45309;
+}
+
+.light .admin-dashboard .text-blue-300 {
+  color: #1d4ed8;
+}
+
+.light .admin-dashboard .text-emerald-400 {
+  color: #059669;
+}
+
+.light .admin-dashboard .text-green-400 {
+  color: #16a34a;
+}
+
+.light .admin-dashboard .text-rose-400,
+.light .admin-dashboard .text-red-400 {
+  color: #dc2626;
+}
+
+.light .admin-dashboard .text-blue-400 {
+  color: #2563eb;
+}
+
+.light .admin-dashboard .text-amber-400 {
+  color: #d97706;
+}
+
 .light .admin-dashboard .bg-white\/5,
 .light .admin-dashboard .bg-white\/\[0\.02\],
 .light .admin-dashboard .bg-white\/\[0\.03\] {
@@ -149,8 +188,29 @@
   color: #9ca3af !important;
 }
 
-.light .admin-dashboard button:not(.bg-emerald-500):not(.bg-gradient-to-r):not(.bg-rose-500\/20):not(.bg-emerald-500\/10):not(.bg-rose-500\/10) {
+.light .admin-dashboard button:not(.bg-emerald-500):not(.bg-emerald-600):not(.bg-emerald-700):not(.bg-gradient-to-r):not(.bg-rose-500\/20):not(.bg-rose-600):not(.bg-emerald-500\/10):not(.bg-rose-500\/10):not(.bg-red-600):not(.bg-red-500):not(.bg-amber-600):not(.bg-green-600):not(.bg-green-500\/20):not(.bg-blue-500\/20) {
   color: #374151;
+}
+
+.light .admin-dashboard button.bg-emerald-600,
+.light .admin-dashboard button.bg-emerald-700,
+.light .admin-dashboard button.bg-rose-600,
+.light .admin-dashboard button.bg-red-600,
+.light .admin-dashboard button.bg-red-500,
+.light .admin-dashboard button.bg-amber-600,
+.light .admin-dashboard button.bg-green-600,
+.light .admin-dashboard a.bg-emerald-600,
+.light .admin-dashboard a.bg-rose-600,
+.light .admin-dashboard a.bg-red-600,
+.light .admin-dashboard a.bg-green-500\/20,
+.light .admin-dashboard a.bg-blue-500\/20,
+.light .admin-dashboard .bg-emerald-600,
+.light .admin-dashboard .bg-rose-600,
+.light .admin-dashboard .bg-red-600,
+.light .admin-dashboard .bg-red-500,
+.light .admin-dashboard .bg-amber-600,
+.light .admin-dashboard .bg-green-600 {
+  color: #ffffff !important;
 }
 
 .light .admin-dashboard .bg-\[var\(--background\)\] {
