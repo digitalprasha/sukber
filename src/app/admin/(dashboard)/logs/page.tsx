@@ -36,7 +36,8 @@ export default async function LogsPage() {
         <div className="text-center py-20 text-gray-500">Belum ada log</div>
       )}
 
-      <div className="overflow-x-auto">
+      {/* Desktop table */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/10">
@@ -50,17 +51,33 @@ export default async function LogsPage() {
             {logs?.map((log) => (
               <tr key={log.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-3 px-4 text-gray-400 whitespace-nowrap">{formatDate(log.timestamp)}</td>
-                <td className="py-3 px-4 text-white">{log.user_email}</td>
+                <td className="py-3 px-4 text-white max-w-[200px] truncate" title={log.user_email}>{log.user_email}</td>
                 <td className="py-3 px-4">
                   <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300">
                     {log.action}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-gray-400 max-w-md truncate">{log.details}</td>
+                <td className="py-3 px-4 text-gray-400 max-w-md truncate" title={log.details}>{log.details}</td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {logs?.map((log) => (
+          <div key={log.id} className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-gray-500">{formatDate(log.timestamp)}</span>
+              <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 shrink-0">
+                {log.action}
+              </span>
+            </div>
+            <p className="text-sm text-white font-medium truncate">{log.user_email}</p>
+            <p className="text-xs text-gray-400 line-clamp-2">{log.details}</p>
+          </div>
+        ))}
       </div>
     </div>
   )
