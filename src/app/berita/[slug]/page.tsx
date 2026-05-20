@@ -46,6 +46,13 @@ export default async function NewsDetailPage({ params }: Props) {
       <Navigation />
       <main className="pt-24 pb-20 px-4">
         <article className="max-w-3xl mx-auto">
+          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <a href="/" className="hover:text-emerald-400 transition-colors">Beranda</a>
+            <span>/</span>
+            <a href="/berita" className="hover:text-emerald-400 transition-colors">Berita</a>
+            <span>/</span>
+            <span className="text-gray-400 truncate max-w-[200px]">{news.title}</span>
+          </nav>
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <time className="text-sm text-gray-500">{formatDate(news.created_at)}</time>

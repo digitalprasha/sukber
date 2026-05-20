@@ -35,6 +35,11 @@ export default async function EventsPage({
     <>
       <Navigation />
       <main className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
+        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+          <a href="/" className="hover:text-emerald-400 transition-colors">Beranda</a>
+          <span>/</span>
+          <span className="text-gray-400">Acara</span>
+        </nav>
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Acara & Kegiatan</h1>
           <p className="text-gray-400 max-w-2xl mx-auto mb-8">

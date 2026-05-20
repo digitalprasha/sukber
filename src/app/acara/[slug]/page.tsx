@@ -59,6 +59,13 @@ export default async function EventDetailPage({ params }: Props) {
     <>
       <Navigation />
       <main className="pt-24 pb-20 px-4">
+        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6 max-w-6xl mx-auto">
+          <a href="/" className="hover:text-emerald-400 transition-colors">Beranda</a>
+          <span>/</span>
+          <a href="/acara" className="hover:text-emerald-400 transition-colors">Acara</a>
+          <span>/</span>
+          <span className="text-gray-400 truncate max-w-[200px]">{event.title}</span>
+        </nav>
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-12">
           <div>
             {event.flyer_url ? (
