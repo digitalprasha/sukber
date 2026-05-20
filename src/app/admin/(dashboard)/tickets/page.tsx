@@ -33,20 +33,19 @@ export default function TicketsPage() {
   const [rejectTarget, setRejectTarget] = useState<Participant | null>(null)
   const [rejectReason, setRejectReason] = useState('')
   const [rejectChannel, setRejectChannel] = useState<'wa' | 'email'>('wa')
+  const [proofTarget, setProofTarget] = useState<Participant | null>(null)
   const linkRef = useRef<HTMLAnchorElement>(null)
   const loaded = useRef(false)
 
   const reload = () => {
     setLoading(true)
-    const eventFilter = selectedEvent !== 'all' ? `event_id.eq.${selectedEvent}` : undefined
-    const searchFilter = searchQuery
-      ? `or(name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,registration_number.ilike.%${searchQuery}%)`
-      : undefined
+
+    let query = supabase.from('participants').select('*', { count: 'exact' })
+    if (selectedEvent !== 'all') query = query.eq('event_id', selectedEvent)
+    if (searchQuery) query = query.or(`name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,registration_number.ilike.%${searchQuery}%`)
 
     Promise.all([
-      supabase.from('participants').select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range((page - 1) * PER_PAGE, page * PER_PAGE - 1),
+      query.order('created_at', { ascending: false }).range((page - 1) * PER_PAGE, page * PER_PAGE - 1),
       supabase.from('events').select('id, title, ticket_prefix'),
     ]).then(([partRes, evRes]) => {
       setParticipants(partRes.data || [])
@@ -189,13 +188,13 @@ export default function TicketsPage() {
                       <span className="text-white font-mono">{p.registration_number || '-'}</span>
                     </td>
                     <td className="py-3 px-4">{statusBadge(p.status)}</td>
-                    <td className="py-3 px-4">
-                      {p.payment_proof_url ? (
-                        <a href={p.payment_proof_url} target="_blank"
-                          className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300">
-                          <ExternalLink size={14} /> Lihat
-                        </a>
-                      ) : <span className="text-gray-600">-</span>}
+                  <td className="py-3 px-4">
+                    {p.payment_proof_url ? (
+                      <button onClick={() => setProofTarget(p)}
+                        className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300">
+                        <ExternalLink size={14} /> Lihat
+                      </button>
+                    ) : <span className="text-gray-600">-</span>}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
@@ -246,10 +245,10 @@ export default function TicketsPage() {
                   {p.registration_number || '-'}
                 </div>
                 {p.payment_proof_url && (
-                  <a href={p.payment_proof_url} target="_blank"
+                  <button onClick={() => setProofTarget(p)}
                     className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300">
                     <ExternalLink size={12} /> Lihat Bukti Pembayaran
-                  </a>
+                  </button>
                 )}
                 <div className="flex flex-wrap items-center gap-2 pt-1">
                   {p.status === 'pending' && (
@@ -339,6 +338,24 @@ export default function TicketsPage() {
                 className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-all disabled:opacity-50">
                 Kirim Pesan
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {proofTarget && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setProofTarget(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative max-w-lg w-full rounded-2xl border border-[var(--color-card-border)] bg-[var(--color-card)] shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-card-border)]">
+              <h3 className="font-semibold text-[var(--foreground)]">Bukti Pembayaran — {proofTarget.name}</h3>
+              <button onClick={() => setProofTarget(null)} className="text-[var(--color-text-muted)] hover:text-[var(--foreground)] transition-colors">
+                <XCircle size={20} />
+              </button>
+            </div>
+            <div className="p-4">
+              <img src={proofTarget.payment_proof_url} alt="Bukti Pembayaran"
+                className="w-full rounded-xl object-contain max-h-[70vh]" />
             </div>
           </div>
         </div>
