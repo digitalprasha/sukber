@@ -2,6 +2,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+function gmailUrl(email: string) {
+  const params = new URLSearchParams({ view: 'cm', fs: '1', to: email })
+  return `https://mail.google.com/mail/?${params.toString()}`
+}
+
 export async function Footer() {
   const supabase = await createServerSupabaseClient()
   const { data: contactRows } = await supabase
@@ -47,15 +52,21 @@ export async function Footer() {
                   Instagram: {contact.instagram.replace('@', '')}
                 </a>
               ) : (
-                <p>Instagram: @sukabernyanyi</p>
+                <a href="https://instagram.com/sukabernyanyi" target="_blank" rel="noopener noreferrer"
+                  className="block hover:text-emerald-400 transition-colors">
+                  Instagram: sukabernyanyi
+                </a>
               )}
               {contact.email ? (
-                <a href={`mailto:${contact.email}`}
+                <a href={gmailUrl(contact.email)} target="_blank" rel="noopener noreferrer"
                   className="block hover:text-emerald-400 transition-colors">
                   Email: {contact.email}
                 </a>
               ) : (
-                <p>Email: info@sukabernyanyi.com</p>
+                <a href={gmailUrl('info@sukabernyanyi.com')} target="_blank" rel="noopener noreferrer"
+                  className="block hover:text-emerald-400 transition-colors">
+                  Email: info@sukabernyanyi.com
+                </a>
               )}
               {contact.whatsapp && (
                 <a href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer"
