@@ -9,6 +9,25 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
 
     if (action === 'verify_participant') {
+      // Check quota
+      const { data: event } = await supabase
+        .from('events')
+        .select('max_participants')
+        .eq('id', data.event_id)
+        .single()
+
+      if (event?.max_participants) {
+        const { count: approvedCount } = await supabase
+          .from('participants')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', data.event_id)
+          .in('status', ['verified', 'checked_in'])
+
+        if (approvedCount !== null && approvedCount >= event.max_participants) {
+          return NextResponse.json({ error: 'Kuota peserta sudah penuh' }, { status: 400 })
+        }
+      }
+
       const token = crypto.randomUUID()
       const count = data.current_count || 0
       const regNumber = `${data.ticket_prefix}-${String(count + 1).padStart(3, '0')}`

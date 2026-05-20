@@ -11,6 +11,25 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
+    // Check quota
+    const { data: event } = await supabase
+      .from('events')
+      .select('max_participants')
+      .eq('id', event_id)
+      .single()
+
+    if (event?.max_participants) {
+      const { count } = await supabase
+        .from('participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_id', event_id)
+        .in('status', ['verified', 'checked_in'])
+
+      if (count !== null && count >= event.max_participants) {
+        return NextResponse.json({ error: 'Maaf, kuota peserta untuk event ini sudah penuh' }, { status: 400 })
+      }
+    }
+
     const { data: existing } = await supabase
       .from('participants')
       .select('id, status')

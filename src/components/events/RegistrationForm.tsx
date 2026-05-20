@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Upload, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
@@ -19,6 +19,15 @@ export function RegistrationForm({ eventId, fee, maxParticipants, deadline }: Re
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [remaining, setRemaining] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!maxParticipants) return
+    fetch(`/api/events/${eventId}/quota`)
+      .then(r => r.json())
+      .then(d => setRemaining(d.remaining))
+      .catch(() => {})
+  }, [eventId, maxParticipants])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,13 +95,22 @@ export function RegistrationForm({ eventId, fee, maxParticipants, deadline }: Re
     )
   }
 
+  if (maxParticipants && remaining !== null && remaining <= 0) {
+    return (
+      <div className="text-center py-6">
+        <Users className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+        <p className="text-gray-500 text-sm">Kuota peserta sudah penuh</p>
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {maxParticipants && (
+      {maxParticipants && remaining !== null && (
         <div className="flex flex-wrap gap-3 mb-2">
           <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
             <Users size={12} />
-            Sisa {maxParticipants} kursi
+            {remaining > 0 ? `Sisa ${remaining} kursi` : 'Kuota penuh'}
           </div>
           {deadline && (
             <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">

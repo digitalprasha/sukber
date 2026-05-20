@@ -77,6 +77,7 @@ export default function TicketsPage() {
       body: JSON.stringify({
         action: 'verify_participant',
         id: approveTarget.id,
+        event_id: approveTarget.event_id,
         name: approveTarget.name,
         ticket_prefix: event.ticket_prefix,
         current_count: count,
