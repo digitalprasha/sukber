@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import Image from 'next/image'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 function useMousePosition() {
   const [pos, setPos] = useState({ x: 0, y: 0 })
@@ -121,6 +123,14 @@ export default function AdminLoginPage() {
           <p className="text-xs text-gray-600 text-center mt-5">
             Hanya untuk staff yang terdaftar
           </p>
+
+          <Link
+            href="/"
+            className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-emerald-400 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Kembali ke Beranda
+          </Link>
         </div>
       </div>
     </div>
