@@ -232,10 +232,10 @@ export function ParallaxHero() {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#0a0f0d] via-[#0a0f0d]/80 to-transparent z-20" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#0a0f0d] via-[#0a0f0d]/80 to-transparent z-[5] pointer-events-none" />
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-fade-in" style={{ animationDelay: '1.2s' }}>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5] pointer-events-none animate-fade-in" style={{ animationDelay: '1.2s' }}>
         <div className="flex flex-col items-center gap-2">
           <span className="text-[10px] text-emerald-600/50 tracking-widest uppercase">Scroll</span>
           <div className="w-[2px] h-8 bg-gradient-to-b from-emerald-500/50 to-transparent relative overflow-hidden">
