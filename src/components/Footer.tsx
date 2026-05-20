@@ -41,9 +41,28 @@ export async function Footer() {
           <div>
             <h3 className="font-semibold text-white mb-3">Kontak</h3>
             <div className="space-y-2 text-sm text-gray-500">
-              <p>Instagram: {contact.instagram || '@sukabernyanyi'}</p>
-              <p>Email: {contact.email || 'info@sukabernyanyi.com'}</p>
-              {contact.whatsapp && <p>WhatsApp: {contact.whatsapp}</p>}
+              {contact.instagram ? (
+                <a href={`https://instagram.com/${contact.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+                  className="block hover:text-emerald-400 transition-colors">
+                  Instagram: {contact.instagram.replace('@', '')}
+                </a>
+              ) : (
+                <p>Instagram: @sukabernyanyi</p>
+              )}
+              {contact.email ? (
+                <a href={`mailto:${contact.email}`}
+                  className="block hover:text-emerald-400 transition-colors">
+                  Email: {contact.email}
+                </a>
+              ) : (
+                <p>Email: info@sukabernyanyi.com</p>
+              )}
+              {contact.whatsapp && (
+                <a href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer"
+                  className="block hover:text-emerald-400 transition-colors">
+                  WhatsApp: {contact.whatsapp}
+                </a>
+              )}
               {contact.address && <p>{contact.address}</p>}
             </div>
           </div>
